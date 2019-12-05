@@ -7,8 +7,11 @@ import time
 from digi.xbee.devices import XBeeDevice
 
 ##Make an instance of XBeeDevice and opening a connection with the device
-device = XBeeDevice("/dev/ttyUSB2", 9600)
-device.open()
+try:
+	device = XBeeDevice("/dev/ttyUSB2", 9600)
+	device.open()
+except Exception as e:
+	print(str(e))
 
 ##File where the android device will be writing to 
 exists = os.path.isfile('/dev/rfcomm0') 
