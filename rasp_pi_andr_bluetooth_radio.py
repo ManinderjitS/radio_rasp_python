@@ -74,10 +74,15 @@ def send_message(mssg):
 	global device	
 	device.send_data_broadcast(mssg)
 
-##This is pretty much main method
-if __name__ == "__main__":
+##This is the main function
+def main():
 	global device
+	xbee_instance()
 	print("Begining the execution of the file here")	 
 	##Closing the connection
 	device.close()
+
+##Letting the Python interpreter about the main function
+if __name__ == "__main__":
+	main()
 	 
