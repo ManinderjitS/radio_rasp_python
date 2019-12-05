@@ -8,43 +8,52 @@ import time
 import bluetooth
 from digi.xbee.devices import XBeeDevice
 
-##Make an instance of XBeeDevice and opening a connection with the device
-try:
-	device = XBeeDevice("/dev/ttyUSB2", 9600)
-	device.open()
-except Exception as e:
-	print(str(e))
-
-##Bluetooth####
+device = object()
 hostMACAddress = "B8:27:EB:0A:26:6F" #for bluetooth interface
-port = 0
-backlog = 1
-size = 1024
-s = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+blueth_sock = object()
 
-try:
-	s.bind((hostMACAddress, port))
-	s.listen(backlog)
-except Exception as e:
-	print(str(e))
+##Creating an instance of XBeeDevice and opening a connection with the device
+def xbee_instance():
+	global device
+	try:
+		device = XBeeDevice("/dev/ttyUSB2", 9600)
+		device.open()
+	except Exception as e:
+		print(str(e))
+	
+
+##This function makes a bluetooth socket 
+def bluetooth_socket_binding():
+	global blueth_sock
+	port = 0
+	backlog = 1
+	blueth_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+	try:
+		blueth_sock.bind((hostMACAddress, port))
+		blueth_sock.listen(backlog)
+	except Exception as e:
+		print(str(e))
+
+#In our case the client almost always will be an Android device 
+def lisening_client_connection_data():
+	global blueth_sock
+	size = 1024
+	
+	try:
+		client, clientInfo = blueth_sock.accept()
+		while 1:
+			data = client.recv(size)
+			if data:
+				print(data)
+				send_message(data)
+				##client.send(data) # Echo back to client
+	except Exception as e:	
+		print("[Closing socket]: " + e)
+		client.close()
+		blueth_sock.close()
 
 ##File where the android device will be writing to 
-exists = os.path.isfile('/dev/rfcomm0') 
-
-##
-try:
-	client, clientInfo = s.accept()
-	while 1:
-		data = client.recv(size)
-		if data:
-			print(data)
-			client.send(data) # Echo back to client
-except Exception as e:	
-    print("Closing socket: " + e)
-    client.close()
-    s.close()
-
-
+#~ exists = os.path.isfile('/dev/rfcomm0') 
 ##This infinite loop is checking from new data received from the user 
 ##	(android device) every 5 seconds
 #~ while(1):
@@ -60,9 +69,15 @@ except Exception as e:
 	#~ else:
 		#~ print("The file doesn't exist. \n\tCheck bluetooth connection with phone.")
 
-##Closing the connection
-device.close()
-
 ##The function that will send the mssg to the radio
 def send_message(mssg):
+	global device	
 	device.send_data_broadcast(mssg)
+
+##This is pretty much main method
+if __name__ == "__main__":
+	global device
+	print("Begining the execution of the file here")	 
+	##Closing the connection
+	device.close()
+	 
