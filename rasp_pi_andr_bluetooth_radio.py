@@ -42,11 +42,14 @@ def listening_client_connection_data():
 	try:
 		client, clientInfo = blueth_sock.accept()
 		while 1:
-			data = client.recv(size)
-			if data:
-				print(data)
-				#send_message(data)
-				##client.send(data) # Echo back to client
+			try:
+				data = client.recv(size)
+				if data:
+					print(data)
+					#send_message(data)
+					##client.send(data) # Echo back to client
+			except Exception as e:
+				print(str(e))
 	except Exception as e:	
 		print("[Closing socket]: " + e)
 		client.close()
