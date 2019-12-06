@@ -77,7 +77,10 @@ def send_message(mssg):
 ##This is the main function
 def main():
 	global device
+	##Instantiate the xbee device
 	xbee_instance()
+	##Make a bluetooth socket
+	bluetooth_socket_binding()
 	print("Begining the execution of the file here")	 
 	##Closing the connection
 	device.close()
