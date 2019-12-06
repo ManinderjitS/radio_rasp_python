@@ -35,7 +35,7 @@ def bluetooth_socket_binding():
 		print(str(e))
 
 #In our case the client almost always will be an Android device 
-def lisening_client_connection_data():
+def listening_client_connection_data():
 	global blueth_sock
 	size = 1024
 	
@@ -77,11 +77,14 @@ def send_message(mssg):
 ##This is the main function
 def main():
 	global device
+	print("Begining the execution of the file here")
 	##Instantiate the xbee device
 	xbee_instance()
 	##Make a bluetooth socket
 	bluetooth_socket_binding()
-	print("Begining the execution of the file here")	 
+	##Start listening for connection
+	listening_client_connection_data()
+		 
 	##Closing the connection
 	device.close()
 
