@@ -38,9 +38,9 @@ def bluetooth_socket_binding():
 def listening_client_connection_data():
 	global blueth_sock
 	size = 1024
-	
 	try:
 		client, clientInfo = blueth_sock.accept()
+		print("Client connected: listening for data.")
 		while 1:
 			try:
 				data = client.recv(size)
@@ -75,7 +75,8 @@ def listening_client_connection_data():
 ##The function that will send the mssg to the radio
 def send_message(mssg):
 	global device	
-	device.send_data_broadcast(mssg)
+	if(device):
+		device.send_data_broadcast(mssg)
 
 ##This is the main function
 def main():
