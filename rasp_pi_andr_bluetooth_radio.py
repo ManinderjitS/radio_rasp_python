@@ -19,6 +19,7 @@ clientInfo = object()
 received_android_mssg_que = [] 
 received_xbee_mssg_que = []
 
+#This class isn't being used yet
 class FuncThread(threading.Thread):
     def __init__(self, target, *args):
         self._target = target
@@ -58,7 +59,7 @@ def listening_client_connection_data():
 		client, clientInfo = blueth_sock.accept()
 		print("Client connected: listening for data.")
 		#start another thread for function which listens for incoming radio mssgs
-		t1 = FuncThread(listen_for_radio_mssgs)
+		t1 = threading.Thread(target=listen_for_radio_mssgs)
 		t1.start()
 		while 1:
 			try:
