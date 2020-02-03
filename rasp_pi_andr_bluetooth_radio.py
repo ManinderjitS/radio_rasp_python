@@ -46,8 +46,9 @@ def listening_client_connection_data():
 				data = client.recv(size)
 				if data:
 					print(data)
-					send_message(data)
-					##client.send(data) # Echo back to client
+					#send_message(data)
+					print("Sending back to the client")
+					client.send(data) # Echo back to client
 			except Exception as e:
 				print(str(e))
 	except Exception as e:	
