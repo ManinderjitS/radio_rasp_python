@@ -18,6 +18,7 @@ client = object()
 clientInfo = object()
 received_android_mssg_que = [] 
 received_xbee_mssg_que = []
+radio_mssg_received = False
 
 #This class isn't being used yet
 class FuncThread(threading.Thread):
@@ -55,12 +56,17 @@ def bluetooth_socket_binding():
 def listening_client_connection_data():
 	global blueth_sock, client, clientInfo
 	size = 1024
+	
+	#start another thread for function which listens for incoming radio mssgs
+	t1 = threading.Thread(target=listen_for_radio_mssgs)
+	t1.start()
 	try:
 		client, clientInfo = blueth_sock.accept()
-		print("Client connected: listening for data.")
-		#start another thread for function which listens for incoming radio mssgs
-		t1 = threading.Thread(target=listen_for_radio_mssgs)
-		t1.start()
+		print("Client connected: listening for data.")  
+		#start a second thread to send mssgs received from radio to the 
+		#android using bluetooth
+		t2 = threading.Thread(send_radio_mssgs_to_android)
+		 
 		while 1:
 			try:
 				data = client.recv(size)
@@ -99,16 +105,32 @@ def send_message(mssg):
 	global device	
 	if(device):
 		device.send_data_broadcast(mssg)
+		
+#This method sends data received from xbee to android using Pi's 
+#bluetooth connection with the android		
+def send_radio_mssgs_to_android():
+	global received_xbee_mssg_que, client, radio_mssg_received
+	while 1:
+		if radio_mssg_received:
+			with lock:
+				for mssg in received_xbee_mssg_que:
+					client.send(mssg)
+				received_xbee_mssg_que.clear()
+				radio_mssg_received = False
+		sleep(3)
+		 		
 	
 #Listen for mssgs on the radio device		
 def listen_for_radio_mssgs():
-	global received_xbee_mssg_que, client, clientInfo
+	global received_xbee_mssg_que, client, clientInfo, radio_mssg_received
 	#listen for mssg on radio for 60 sec  
 	while 1:
 		mssg = device.read_data(60)
 		str_mssg = mssg.data.decode("utf-8")
 		with lock:
-			client.send(mssg)
+			#client.send(mssg)
+			received_xbee_mssg_que.append(mssg)
+			radio_mssg_received = True
 			print("received mssg: " + str_mssg)
 
 ##This is the main function
