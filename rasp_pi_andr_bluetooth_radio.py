@@ -18,6 +18,15 @@ client = object()
 clientInfo = object()
 received_android_mssg_que = [] 
 received_xbee_mssg_que = []
+
+class FuncThread(threading.Thread):
+    def __init__(self, target, *args):
+        self._target = target
+        self._args = args
+        threading.Thread.__init__(self)
+ 
+    def run(self):
+        self._target(*self._args)
  
 ##Creating an instance of XBeeDevice and opening a connection with the device
 def xbee_instance():
@@ -49,7 +58,8 @@ def listening_client_connection_data():
 		client, clientInfo = blueth_sock.accept()
 		print("Client connected: listening for data.")
 		#start another thread for function which listens for incoming radio mssgs
-		t = threading.Thread.start_new_thread(listen_for_radio_mssgs,())
+		t1 = FuncThread(listen_for_radio_mssgs)
+		t1.start()
 		while 1:
 			try:
 				t.start()
@@ -61,6 +71,7 @@ def listening_client_connection_data():
 					#client.send(data) # Echo back to client
 			except Exception as e:
 				print(str(e))
+		t1.join()
 	except Exception as e:	
 		print("[Closing socket]: " + e)
 		client.close()
