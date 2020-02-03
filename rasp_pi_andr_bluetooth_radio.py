@@ -6,12 +6,19 @@
 import os
 import time
 import bluetooth
+import threading
 from digi.xbee.devices import XBeeDevice
+
+lock = threading.Lock()
 
 device = object()
 hostMACAddress = "B8:27:EB:0A:26:6F" #for bluetooth interface
 blueth_sock = object()
-
+client = object()
+clientInfo = object()
+received_android_mssg_que = [] 
+received_xbee_mssg_que = []
+ 
 ##Creating an instance of XBeeDevice and opening a connection with the device
 def xbee_instance():
 	global device
@@ -36,19 +43,22 @@ def bluetooth_socket_binding():
 
 #In our case the client almost always will be an Android device 
 def listening_client_connection_data():
-	global blueth_sock
+	global blueth_sock, client, clientInfo
 	size = 1024
 	try:
 		client, clientInfo = blueth_sock.accept()
 		print("Client connected: listening for data.")
+		#start another thread for function which listens for incoming radio mssgs
+		t = threading.thread.start_new_thread(listen_for_radio_mssgs,())
 		while 1:
 			try:
+				t.start()
 				data = client.recv(size)
 				if data:
 					print(data)
-					#send_message(data)
+					send_message(data)
 					print("Sending back to the client")
-					client.send(data) # Echo back to client
+					#client.send(data) # Echo back to client
 			except Exception as e:
 				print(str(e))
 	except Exception as e:	
@@ -78,6 +88,17 @@ def send_message(mssg):
 	global device	
 	if(device):
 		device.send_data_broadcast(mssg)
+	
+#Listen for mssgs on the radio device		
+def listen_for_radio_mssgs():
+	global received_xbee_mssg_que, client, clientInfo
+	#listen for mssg on radio for 60 sec  
+	while 1:
+		mssg = device.read_data(60)
+		str_mssg = mssg.data.decode("utf-8")
+		with lock:
+			client.send(mssg)
+			print("received mssg: " + str_mssg)
 
 ##This is the main function
 def main():
