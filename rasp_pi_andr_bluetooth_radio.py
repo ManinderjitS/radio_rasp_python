@@ -62,7 +62,6 @@ def listening_client_connection_data():
 		t1.start()
 		while 1:
 			try:
-				t.start()
 				data = client.recv(size)
 				if data:
 					print(data)
