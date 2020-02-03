@@ -49,7 +49,7 @@ def listening_client_connection_data():
 		client, clientInfo = blueth_sock.accept()
 		print("Client connected: listening for data.")
 		#start another thread for function which listens for incoming radio mssgs
-		t = threading.thread.start_new_thread(listen_for_radio_mssgs,())
+		t = threading.Thread.start_new_thread(listen_for_radio_mssgs,())
 		while 1:
 			try:
 				t.start()
