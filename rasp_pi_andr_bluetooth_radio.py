@@ -65,8 +65,8 @@ def listening_client_connection_data():
 		print("Client connected: listening for data.")  
 		#start a second thread to send mssgs received from radio to the 
 		#android using bluetooth
-		t2 = threading.Thread(send_radio_mssgs_to_android)
-		 
+		t2 = threading.Thread(target=send_radio_mssgs_to_android)
+		t2.start()
 		while 1:
 			try:
 				data = client.recv(size)
