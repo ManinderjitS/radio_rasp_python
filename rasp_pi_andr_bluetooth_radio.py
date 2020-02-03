@@ -118,7 +118,7 @@ def send_radio_mssgs_to_android():
 					client.send(mssg)
 				received_xbee_mssg_que.clear()
 				radio_mssg_received = False
-		sleep(3)
+		time.sleep(3)
 		 		
 	
 #Listen for mssgs on the radio device		
