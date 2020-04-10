@@ -57,7 +57,7 @@ def bluetooth_socket_binding():
 		print(str(e))
 
 #In our case the client almost always will be an Android device 
-def listening_client_connection_data():
+def blth_listening_client_connection_data():
 	print(">>>>>listen client on bluth")
 	global blueth_sock, client, clientInfo, got_a_mssg_to_send
 	size = 1024
@@ -69,8 +69,8 @@ def listening_client_connection_data():
 		client, clientInfo = blueth_sock.accept() 
 		#start a second thread to send mssgs received from radio to the 
 		#android using bluetooth
-		t2 = threading.Thread(target=listen_for_radio_mssgs)
-		t2.start()
+		# ~ t2 = threading.Thread(target=listen_for_radio_mssgs)
+		# ~ t2.start()
 		while 1:
 			print("Bluetooth connected: listening for data.") 
 			try:
@@ -165,7 +165,7 @@ def main():
 	##Make a bluetooth socket
 	bluetooth_socket_binding()
 	##Start listening for connection
-	listening_client_connection_data()
+	blth_listening_client_connection_data()
 		 
 	##Closing the connection
 	device.close()
