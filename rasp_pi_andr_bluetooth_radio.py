@@ -80,7 +80,7 @@ def blth_listening_client_connection_data():
 					print(data)
 					got_a_mssg_to_send = True
 					out_going_mssg_que.append(data)
-					#~ send_message(data)					
+					send_message()					
 					#client.send(data) # Echo back to client
 			except Exception as e:
 				print(str(e))
