@@ -133,6 +133,11 @@ def listen_for_radio_mssgs():
 	#listen for mssg on radio for 60 sec  
 	while 1:
 		print("Listening for radio mssgs")
+		if got_a_mssg_to_send:
+			print("There is a mssg to send")
+			send_message()
+		else:
+			print("No mssg has been received")
 		try:
 			mssg = device.read_data(10)					
 			str_mssg = mssg.data.decode("utf-8")
@@ -145,11 +150,6 @@ def listen_for_radio_mssgs():
 		except Exception as e:
 			print(str(e))
 			continue 
-		if got_a_mssg_to_send:
-			print("There is a mssg to send")
-			send_message()
-		else:
-			print("No mssg has been received")
 
 ##This is the main function
 def main():
