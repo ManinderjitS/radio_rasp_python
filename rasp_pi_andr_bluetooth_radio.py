@@ -69,8 +69,8 @@ def blth_listening_client_connection_data():
 		client, clientInfo = blueth_sock.accept() 
 		#start a second thread to send mssgs received from radio to the 
 		#android using bluetooth
-		# ~ t2 = threading.Thread(target=listen_for_radio_mssgs)
-		# ~ t2.start()
+		t2 = threading.Thread(target=listen_for_radio_mssgs)
+		t2.start()
 		while 1:
 			print("main thread - - - - - - Bluetooth connected: listening for data.") 
 			try:
@@ -80,7 +80,7 @@ def blth_listening_client_connection_data():
 					print(data)
 					got_a_mssg_to_send = True
 					out_going_mssg_que.append(data)
-					send_message()					
+					#~ send_message(data)					
 					#client.send(data) # Echo back to client
 			except Exception as e:
 				print(str(e))
