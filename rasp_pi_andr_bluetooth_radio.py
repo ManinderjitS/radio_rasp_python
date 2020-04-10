@@ -124,12 +124,15 @@ def send_radio_mssgs_to_android():
 	
 #Listen for mssgs on the radio device		
 def listen_for_radio_mssgs():
+	print("Listening for radio mssgs: ")
 	global received_xbee_mssg_que, client, clientInfo, radio_mssg_received
 	#listen for mssg on radio for 60 sec  
 	while 1:
+		print("In the loop ")
 		mssg = device.read_data(60)
 		str_mssg = mssg.data.decode("utf-8")
 		with lock:
+			print("The lock thing")
 			#client.send(mssg)
 			received_xbee_mssg_que.append(mssg)
 			radio_mssg_received = True
