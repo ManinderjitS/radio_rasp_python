@@ -45,6 +45,7 @@ def xbee_instance():
 
 ##This function makes a bluetooth socket 
 def bluetooth_socket_binding():
+	print("bbbbbbbbbbbBinding socket")
 	global blueth_sock
 	port = 0
 	backlog = 1
@@ -57,6 +58,7 @@ def bluetooth_socket_binding():
 
 #In our case the client almost always will be an Android device 
 def listening_client_connection_data():
+	print(">>>>>listen client on bluth")
 	global blueth_sock, client, clientInfo, got_a_mssg_to_send
 	size = 1024
 	
@@ -107,6 +109,7 @@ def listening_client_connection_data():
 
 ##The function that will send the mssg to the radio
 def send_message():	
+	print("-----------send msssg")
 	global device, out_going_mssg_que	
 	if(device):
 		for mssg in out_going_mssg_que:
@@ -130,6 +133,7 @@ def send_radio_mssgs_to_android():
 	
 #Listen for mssgs on the radio device		
 def listen_for_radio_mssgs():
+	print("Listen for radio mssg")
 	global received_xbee_mssg_que, client, clientInfo, radio_mssg_received, got_a_mssg_to_send
 	#listen for mssg on radio for 60 sec  
 	while 1:
