@@ -114,13 +114,13 @@ def send_message():
 	for index1, mssg in enumerate(out_going_mssg_que):
 		print("Sending radio mssg: ", mssg)
 		##The outter headers are divided by '-' and the headers end with '\n' char
-		top_most_header = mssg[:mssg.find('-')+1]
-		usr_mssg = mssg[mssg.find('\n')+1:]
-		usr_mssg_divided_up = usr_mssg.split(',')
+		top_most_header = mssg[:mssg.find('-'.encode("utf-8"))+1]
+		usr_mssg = mssg[mssg.find('\n'.encode("utf-8"))+1:]
+		usr_mssg_divided_up = usr_mssg.split(','.encode("utf-8"))
 		for index2, divided_str in enumerate(usr_mssg_divided_up):
 			if(device):
 				print("This is the divided string:" + divided_str + ", at pos: " + index)	
-				mssg_to_send = str(index1) + "-" + divided_str
+				mssg_to_send = str(index1).encode("utf-8") + "-" + divided_str
 				device.send_data_broadcast(mssg_to_send)
 	out_going_mssg_que.clear()
 		
