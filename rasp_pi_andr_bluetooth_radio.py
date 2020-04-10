@@ -72,7 +72,7 @@ def blth_listening_client_connection_data():
 		# ~ t2 = threading.Thread(target=listen_for_radio_mssgs)
 		# ~ t2.start()
 		while 1:
-			print("Bluetooth connected: listening for data.") 
+			print("main thread - - - - - - Bluetooth connected: listening for data.") 
 			try:
 				data = client.recv(size)
 				if data:
