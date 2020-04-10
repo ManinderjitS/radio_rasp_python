@@ -103,6 +103,7 @@ def listening_client_connection_data():
 
 ##The function that will send the mssg to the radio
 def send_message(mssg):
+	print("Sending radio mssg: ", mssg)
 	global device	
 	if(device):
 		device.send_data_broadcast(mssg)
