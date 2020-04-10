@@ -111,11 +111,18 @@ def blth_listening_client_connection_data():
 def send_message():	
 	print("-----------send msssg")
 	global device, out_going_mssg_que	
-	if(device):
-		for mssg in out_going_mssg_que:
-			print("Sending radio mssg: ", mssg)
-			device.send_data_broadcast(mssg)
-		out_going_mssg_que.clear()
+	for index1, mssg in enumerate(out_going_mssg_que):
+		print("Sending radio mssg: ", mssg)
+		##The outter headers are divided by '-' and the headers end with '\n' char
+		top_most_header = mssg[:mssg.find('-')+1]
+		usr_mssg = mssg[mssg.find('\n')+1:]
+		usr_mssg_divided_up = usr_mssg.split(',')
+		for index2, divided_str in enumerate(usr_mssg_divided_up):
+			if(device):
+				print("This is the divided string:" + divided_str + ", at pos: " + index)	
+				mssg_to_send = str(index1) + "-" + divided_str
+				device.send_data_broadcast(mssg_to_send)
+	out_going_mssg_que.clear()
 		
 #This method sends data received from xbee to android using Pi's 
 #bluetooth connection with the android		
@@ -140,13 +147,11 @@ def listen_for_radio_mssgs():
 	while 1:
 		print("Listening for radio mssgs")
 		if got_a_mssg_to_send:
-			print("There is a mssg to send")
+			print("There is a mssg to send from the client")
 			send_message()
-		else:
-			print("No mssg has been received")
 		try:
-			mssg = device.read_data(10)					
-			str_mssg = mssg.data.decode("utf-8")
+			mssg = device.read_data(20)					
+			received_mssg = mssg.data.decode("utf-8")
 			#~ with lock:
 				#~ print("The lock thing")
 			#client.send(mssg)
