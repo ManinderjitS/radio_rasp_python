@@ -115,6 +115,7 @@ def send_message():
 		for mssg in out_going_mssg_que:
 			print("Sending radio mssg: ", mssg)
 			device.send_data_broadcast(mssg)
+		out_going_mssg_que.clear()
 		
 #This method sends data received from xbee to android using Pi's 
 #bluetooth connection with the android		
