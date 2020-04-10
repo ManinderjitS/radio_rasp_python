@@ -148,6 +148,8 @@ def listen_for_radio_mssgs():
 		if got_a_mssg_to_send:
 			print("There is a mssg to send")
 			send_message()
+		else:
+			print("No mssg has been received")
 
 ##This is the main function
 def main():
