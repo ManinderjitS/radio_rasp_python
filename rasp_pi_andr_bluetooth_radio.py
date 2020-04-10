@@ -62,13 +62,13 @@ def listening_client_connection_data():
 	t1 = threading.Thread(target=listen_for_radio_mssgs)
 	t1.start()
 	try:
-		client, clientInfo = blueth_sock.accept()
-		print("Client connected: listening for data.")  
+		client, clientInfo = blueth_sock.accept() 
 		#start a second thread to send mssgs received from radio to the 
 		#android using bluetooth
-		t2 = threading.Thread(target=send_radio_mssgs_to_android)
+		t2 = threading.Thread(target=listen_for_radio_mssgs)
 		t2.start()
 		while 1:
+			print("Bluetooth connected: listening for data.") 
 			try:
 				data = client.recv(size)
 				if data:
@@ -124,12 +124,15 @@ def send_radio_mssgs_to_android():
 	
 #Listen for mssgs on the radio device		
 def listen_for_radio_mssgs():
-	print("Listening for radio mssgs: ")
 	global received_xbee_mssg_que, client, clientInfo, radio_mssg_received
 	#listen for mssg on radio for 60 sec  
 	while 1:
-		print("In the loop ")
-		mssg = device.read_data(60)
+		print("Listening for radio mssgs")
+		try:
+			mssg = device.read_data(60)
+		except Exception as e:
+			print(str(e))
+			continue 			
 		str_mssg = mssg.data.decode("utf-8")
 		with lock:
 			print("The lock thing")
