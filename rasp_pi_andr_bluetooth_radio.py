@@ -157,7 +157,7 @@ def listen_for_radio_mssgs():
 			#client.send(mssg)
 			received_xbee_mssg_que.append(mssg)
 			radio_mssg_received = True
-			print("received mssg: " + str_mssg)
+			print("received mssg: " + mssg)
 		except Exception as e:
 			print(str(e))
 			continue 
