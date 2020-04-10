@@ -19,7 +19,9 @@ client = object()
 clientInfo = object()
 received_android_mssg_que = [] 
 received_xbee_mssg_que = []
+out_going_mssg_que = []
 radio_mssg_received = False
+got_a_mssg_to_send = False 
 
 #This class isn't being used yet
 class FuncThread(threading.Thread):
@@ -55,7 +57,7 @@ def bluetooth_socket_binding():
 
 #In our case the client almost always will be an Android device 
 def listening_client_connection_data():
-	global blueth_sock, client, clientInfo
+	global blueth_sock, client, clientInfo, got_a_mssg_to_send
 	size = 1024
 	
 	#start another thread for function which listens for incoming radio mssgs
@@ -73,7 +75,9 @@ def listening_client_connection_data():
 				data = client.recv(size)
 				if data:
 					print(data)
-					send_message(data)
+					got_a_mssg_to_send = True
+					out_going_mssg_que.append(data)
+					#~ send_message(data)
 					print("Sending back to the client")
 					#client.send(data) # Echo back to client
 			except Exception as e:
@@ -102,11 +106,12 @@ def listening_client_connection_data():
 		#~ print("The file doesn't exist. \n\tCheck bluetooth connection with phone.")
 
 ##The function that will send the mssg to the radio
-def send_message(mssg):
-	print("Sending radio mssg: ", mssg)
-	global device	
+def send_message(mssg):	
+	global device, out_going_mssg_que	
 	if(device):
-		device.send_data_broadcast(mssg)
+		for mssg in out_going_mssg_que:
+			print("Sending radio mssg: ", mssg)
+			device.send_data_broadcast(mssg)
 		
 #This method sends data received from xbee to android using Pi's 
 #bluetooth connection with the android		
@@ -124,22 +129,24 @@ def send_radio_mssgs_to_android():
 	
 #Listen for mssgs on the radio device		
 def listen_for_radio_mssgs():
-	global received_xbee_mssg_que, client, clientInfo, radio_mssg_received
+	global received_xbee_mssg_que, client, clientInfo, radio_mssg_received, got_a_mssg_to_send
 	#listen for mssg on radio for 60 sec  
 	while 1:
 		print("Listening for radio mssgs")
 		try:
-			mssg = device.read_data(60)
-		except Exception as e:
-			print(str(e))
-			continue 			
-		str_mssg = mssg.data.decode("utf-8")
-		with lock:
-			print("The lock thing")
+			mssg = device.read_data(10)					
+			str_mssg = mssg.data.decode("utf-8")
+			#~ with lock:
+				#~ print("The lock thing")
 			#client.send(mssg)
 			received_xbee_mssg_que.append(mssg)
 			radio_mssg_received = True
 			print("received mssg: " + str_mssg)
+		except Exception as e:
+			print(str(e))
+			continue 
+		if got_a_mssg_to_send:
+			send_message()
 
 ##This is the main function
 def main():
