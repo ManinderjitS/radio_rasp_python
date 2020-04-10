@@ -74,11 +74,11 @@ def listening_client_connection_data():
 			try:
 				data = client.recv(size)
 				if data:
+					print("Blth mssg received")
 					print(data)
 					got_a_mssg_to_send = True
 					out_going_mssg_que.append(data)
-					#~ send_message(data)
-					print("Sending back to the client")
+					#~ send_message(data)					
 					#client.send(data) # Echo back to client
 			except Exception as e:
 				print(str(e))
@@ -106,7 +106,7 @@ def listening_client_connection_data():
 		#~ print("The file doesn't exist. \n\tCheck bluetooth connection with phone.")
 
 ##The function that will send the mssg to the radio
-def send_message(mssg):	
+def send_message():	
 	global device, out_going_mssg_que	
 	if(device):
 		for mssg in out_going_mssg_que:
@@ -146,6 +146,7 @@ def listen_for_radio_mssgs():
 			print(str(e))
 			continue 
 		if got_a_mssg_to_send:
+			print("There is a mssg to send")
 			send_message()
 
 ##This is the main function
