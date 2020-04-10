@@ -155,9 +155,9 @@ def listen_for_radio_mssgs():
 			#~ with lock:
 				#~ print("The lock thing")
 			#client.send(mssg)
-			received_xbee_mssg_que.append(mssg)
+			received_xbee_mssg_que.append(received_mssg)
 			radio_mssg_received = True
-			print("received mssg: " + mssg)
+			print("received mssg: " + received_mssg)
 		except Exception as e:
 			print(str(e))
 			continue 
