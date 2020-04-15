@@ -160,7 +160,7 @@ def listen_for_radio_mssgs():
 			print("received mssg: " + received_mssg)
 		except Exception as e:
 			print(str(e))
-			send_mssg_driver(i)
+			# ~ send_mssg_driver(i)
 			i = i + 1
 			continue 
 
