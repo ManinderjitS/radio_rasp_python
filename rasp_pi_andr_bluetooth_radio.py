@@ -128,16 +128,13 @@ def send_message():
 #This method sends data received from xbee to android using Pi's 
 #bluetooth connection with the android		
 def send_radio_mssgs_to_android():
-	print("sending mssg from pi to phone")
+	print("*****sending mssg from pi to phone")
 	global received_xbee_mssg_que, client, radio_mssg_received
-	while 1:
-		if radio_mssg_received:
-			with lock:
-				for mssg in received_xbee_mssg_que:
-					client.send(mssg)
-				received_xbee_mssg_que.clear()
-				radio_mssg_received = False
-		time.sleep(3)
+	if radio_mssg_received:
+		for mssg in received_xbee_mssg_que:
+			client.send(mssg)
+		received_xbee_mssg_que.clear()
+		radio_mssg_received = False
 		 		
 	
 #Listen for mssgs on the radio device		
@@ -159,6 +156,7 @@ def listen_for_radio_mssgs():
 			#client.send(mssg)
 			received_xbee_mssg_que.append(received_mssg)
 			radio_mssg_received = True
+			send_radio_mssgs_to_android()
 			print("received mssg: " + received_mssg)
 		except Exception as e:
 			print(str(e))
