@@ -123,6 +123,7 @@ def send_message():
 				mssg_to_send = str(index1).encode("utf-8") + "-".encode("utf-8") + divided_str
 				device.send_data_broadcast(mssg_to_send)
 	out_going_mssg_que.clear()
+	got_a_mssg_to_send = False
 		
 #This method sends data received from xbee to android using Pi's 
 #bluetooth connection with the android		
@@ -144,13 +145,14 @@ def listen_for_radio_mssgs():
 	print("Listen for radio mssg")
 	global received_xbee_mssg_que, client, clientInfo, radio_mssg_received, got_a_mssg_to_send
 	#listen for mssg on radio for 60 sec  
+	i = 0
 	while 1:
 		print("Listening for radio mssgs")
 		if got_a_mssg_to_send:
 			print("There is a mssg to send from the client")
 			send_message()
 		try:
-			mssg = device.read_data(20)					
+			mssg = device.read_data(10)					
 			received_mssg = mssg.data.decode("utf-8")
 			#~ with lock:
 				#~ print("The lock thing")
@@ -160,7 +162,18 @@ def listen_for_radio_mssgs():
 			print("received mssg: " + received_mssg)
 		except Exception as e:
 			print(str(e))
+			send_mssg_driver(i)
+			i = i + 1
 			continue 
+
+#This function is creating for testing purposes, 
+#	its purpose is to send dummy data 
+def send_mssg_driver(num_of_times):
+	global got_a_mssg_to_send
+	print("Inside send_mssg driver")
+	sample_str = "example:" + str(num_of_times)
+	out_going_mssg_que.append(sample_str.encode("utf-8"))
+	got_a_mssg_to_send = True
 
 ##This is the main function
 def main():
