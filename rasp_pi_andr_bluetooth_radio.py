@@ -67,6 +67,7 @@ def blth_listening_client_connection_data():
 	t1.start()
 	try:
 		client, clientInfo = blueth_sock.accept() 
+		send_radio_mssgs_to_android()
 		#start a second thread to send mssgs received from radio to the 
 		#android using bluetooth
 		t2 = threading.Thread(target=listen_for_radio_mssgs)
@@ -78,8 +79,8 @@ def blth_listening_client_connection_data():
 				if data:
 					print("Blth mssg received")
 					print(data)
-					got_a_mssg_to_send = True
-					out_going_mssg_que.append(data)
+					# ~ got_a_mssg_to_send = True
+					# ~ out_going_mssg_que.append(data)
 					#~ send_message(data)					
 					#client.send(data) # Echo back to client
 			except Exception as e:
@@ -156,7 +157,7 @@ def listen_for_radio_mssgs():
 			#client.send(mssg)
 			received_xbee_mssg_que.append(received_mssg)
 			radio_mssg_received = True
-			send_radio_mssgs_to_android()
+			# ~ send_radio_mssgs_to_android()
 			print("received mssg: " + received_mssg)
 		except Exception as e:
 			print(str(e))
