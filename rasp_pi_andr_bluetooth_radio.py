@@ -8,6 +8,7 @@ import time
 import bluetooth
 import threading
 import time
+import json
 from digi.xbee.devices import XBeeDevice
 from enum import Enum
 
@@ -23,7 +24,7 @@ blueth_sock = object()
 client = object()
 clientInfo = object()
 received_android_mssg_que = [] 
-received_xbee_mssg_que = []
+received_xbee_mssg_que = {}
 out_going_mssg_que = []
 radio_mssg_received = False
 got_a_mssg_to_send = False 
@@ -83,7 +84,7 @@ def blth_listening_client_connection_data():
 			try:
 				data = client.recv(size)
 				if data:
-					print("Blth mssg received : " + data.decode("utf-8"))
+					print("Blth mssg received")
 					top_most_header = data[:data.find('-'.encode("utf-8"))]
 					if(int(top_most_header.decode("utf-8")) == HeaderMssgType.SENDTOANDROID.value):
 						print("a-a--a-a--aAndroid wants to know if it got somethign")
@@ -92,7 +93,8 @@ def blth_listening_client_connection_data():
 						print("received data to send=-=-=-=-")
 						data = data[data.find('\n'.encode("utf-8"))+1:]
 						got_a_mssg_to_send = True
-						out_going_mssg_que.append(data)
+						data_json = convert_data_to_json(data.decode("urf-8"))
+						out_going_mssg_que.append(data_json)
 					#~ send_message(data)					
 					#client.send(data) # Echo back to client
 			except Exception as e:
@@ -126,12 +128,13 @@ def send_message():
 	global device, out_going_mssg_que	
 	for index1, mssg in enumerate(out_going_mssg_que):
 		print("Sending radio mssg: ", mssg)
-		##The outter headers are divided by '-' and the headers end with '\n' char
-		usr_mssg_divided_up = mssg.split(','.encode("utf-8"))
-		for index2, divided_str in enumerate(usr_mssg_divided_up):
+		for key, value in mssg.items():
 			if(device):
-				print("This is the divided string:" + divided_str.decode("utf-8") + ", at pos: " + str(index1))	
-				mssg_to_send = str(index1).encode("utf-8") + "-".encode("utf-8") + divided_str
+				mssg_to_send = mssg["time"].encode("utf-8") + 
+								"-".encode("utf-8") + 
+								key.encode("utf-8") + 
+								":".encode("utf-8") +
+								value.encode("utf-8")
 				device.send_data_broadcast(mssg_to_send)
 	out_going_mssg_que.clear()
 	got_a_mssg_to_send = False
@@ -142,7 +145,12 @@ def send_radio_mssgs_to_android():
 	print("*****sending mssg from pi to phone")
 	global received_xbee_mssg_que, client, radio_mssg_received
 	if radio_mssg_received:
-		for mssg in received_xbee_mssg_que:
+		for key, value in received_xbee_mssg_que:
+			mssg = "{" ##This will be a string json object
+			for element in value:
+				mssg = mssg + element + ","
+			mssg = mssg = "}" 
+			print("---sending back to client: " + mssg)
 			client.send(mssg)
 		received_xbee_mssg_que.clear()
 	radio_mssg_received = False
@@ -165,8 +173,14 @@ def listen_for_radio_mssgs():
 			#~ with lock:
 				#~ print("The lock thing")
 			#client.send(mssg)
-			received_xbee_mssg_que.append(received_mssg)
-			radio_mssg_received = True
+			mssg_header = received_mssg[:received_mssg.find('-')]
+			received_mssg = received_mssg[received_mssg.find('-')+1:]
+			if(mssg_header in received_xbee_mssg_que):
+				received_xbee_mssg_que[mssg_header].append(received_mssg)
+				radio_mssg_received = True
+			else:
+				received_android_mssg_que[mssg_header] = []
+				received_android_mssg_que[mssg_header].append(received_mssg)
 			# ~ send_radio_mssgs_to_android()
 			print("received mssg: " + received_mssg)
 		except Exception as e:
@@ -183,6 +197,11 @@ def send_mssg_driver(num_of_times):
 	sample_str = "example:" + str(num_of_times)
 	out_going_mssg_que.append(sample_str.encode("utf-8"))
 	got_a_mssg_to_send = True
+	
+##This function converts the string received to json
+def convert_data_to_json(data):
+	data_json = json.loads(data)
+	return(data_json)
 
 ##This is the main function
 def main():
