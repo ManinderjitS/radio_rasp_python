@@ -203,8 +203,8 @@ def send_mssg_driver(num_of_times):
 					"mssgType:" + "-123.123123,"
 					"isMyMssg:" + "True,"
 				"}")
-					
-	out_going_mssg_que.append(sample_str.encode("utf-8"))
+	sample_str_json = convert_data_to_json(sample_str)
+	out_going_mssg_que.append(sample_str_json)				
 	got_a_mssg_to_send = True
 	
 ##This function converts the string received to json
