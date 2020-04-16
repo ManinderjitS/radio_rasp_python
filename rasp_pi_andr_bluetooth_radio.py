@@ -192,7 +192,7 @@ def send_mssg_driver(num_of_times):
 	print("Inside send_mssg driver")
 	sample_str = ("{"
 					"time:" + str(num_of_times) + ","
-					"mssgId:" + "Iasdas9129nsa21," + \
+					"mssgId:" + "Iasdas9129nsa21,"
 					"mssgText:" + "hello there, " + str(num_of_times) + ","
 					"receiverId:" + "someID,"
 					"receiverName:" + "someName,"
