@@ -191,17 +191,17 @@ def send_mssg_driver(num_of_times):
 	global got_a_mssg_to_send
 	print("Inside send_mssg driver")
 	sample_str = "{"\
-					"time:" + str(num_of_times) + ","\
-					"mssgId:" + "Iasdas9129nsa21,"\
-					"mssgText:" + "hello there, " + str(num_of_times) + ","\
-					"receiverId:" + "someID,"\ 
-					"receiverName:" + "someName,"\
-					"senderId:" + "someID1,"\
-					"senderName:" + "someName1,"\
-					"latitude:" + "someLat,"\
-					"longitude:" + "123.123213,"\
-					"mssgType:" + "-123.123123,"\ 
-					"isMyMssg:" + "True,"\
+					"time:" + str(num_of_times) + "," + \
+					"mssgId:" + "Iasdas9129nsa21," + \
+					"mssgText:" + "hello there, " + str(num_of_times) + "," + \
+					"receiverId:" + "someID," + \ 
+					"receiverName:" + "someName," + \
+					"senderId:" + "someID1," + \
+					"senderName:" + "someName1," + \
+					"latitude:" + "someLat," + \
+					"longitude:" + "123.123213," + \
+					"mssgType:" + "-123.123123," + \ 
+					"isMyMssg:" + "True," + \
 				"}"
 					
 	out_going_mssg_que.append(sample_str.encode("utf-8"))
