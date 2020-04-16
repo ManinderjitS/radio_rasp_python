@@ -86,12 +86,12 @@ def blth_listening_client_connection_data():
 					print("Blth mssg received")
 					print(data)
 					top_most_header = data[:data.find('-'.encode("utf-8"))+1]
-					if(top_most_header == str(HeaderMssgType.SENDTOANDROID)):
+					if(top_most_header.decode("urf-8") == str(HeaderMssgType.SENDTOANDROID)):
 						print("Android wants to know if it got somethign")
 						send_radio_mssgs_to_android()
 					else:
 						print("received data to send=-=-=-=-")
-						data = mssg[mssg.find('\n'.encode("utf-8"))+1:]
+						data = mssg[data.find('\n'.encode("utf-8"))+1:]
 						got_a_mssg_to_send = True
 						out_going_mssg_que.append(data)
 					#~ send_message(data)					
