@@ -9,6 +9,11 @@ import bluetooth
 import threading
 import time
 from digi.xbee.devices import XBeeDevice
+from enum import Enum
+
+class HeaderMssgType(Enum):
+     SENDTOOUTSIDEWORLD = 1
+     SENDTOANDROID = 4
 
 lock = threading.Lock()
 
@@ -22,6 +27,7 @@ received_xbee_mssg_que = []
 out_going_mssg_que = []
 radio_mssg_received = False
 got_a_mssg_to_send = False 
+
 
 #This class isn't being used yet
 class FuncThread(threading.Thread):
@@ -79,8 +85,15 @@ def blth_listening_client_connection_data():
 				if data:
 					print("Blth mssg received")
 					print(data)
-					# ~ got_a_mssg_to_send = True
-					# ~ out_going_mssg_que.append(data)
+					top_most_header = data[:data.find('-'.encode("utf-8"))+1]
+					if(top_most_header == str(HeaderMssgType.SENDTOANDROID)):
+						print("Android wants to know if it got somethign")
+						send_radio_mssgs_to_android()
+					else:
+						print("received data to send=-=-=-=-")
+						data = mssg[mssg.find('\n'.encode("utf-8"))+1:]
+						got_a_mssg_to_send = True
+						out_going_mssg_que.append(data)
 					#~ send_message(data)					
 					#client.send(data) # Echo back to client
 			except Exception as e:
@@ -115,9 +128,7 @@ def send_message():
 	for index1, mssg in enumerate(out_going_mssg_que):
 		print("Sending radio mssg: ", mssg)
 		##The outter headers are divided by '-' and the headers end with '\n' char
-		top_most_header = mssg[:mssg.find('-'.encode("utf-8"))+1]
-		usr_mssg = mssg[mssg.find('\n'.encode("utf-8"))+1:]
-		usr_mssg_divided_up = usr_mssg.split(','.encode("utf-8"))
+		usr_mssg_divided_up = mssg.split(','.encode("utf-8"))
 		for index2, divided_str in enumerate(usr_mssg_divided_up):
 			if(device):
 				print("This is the divided string:" + divided_str.decode("utf-8") + ", at pos: " + str(index1))	
