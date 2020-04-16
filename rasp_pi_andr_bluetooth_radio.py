@@ -83,10 +83,8 @@ def blth_listening_client_connection_data():
 			try:
 				data = client.recv(size)
 				if data:
-					print("Blth mssg received")
-					print(data)
+					print("Blth mssg received : " + data.decode("utf-8"))
 					top_most_header = data[:data.find('-'.encode("utf-8"))]
-					print(top_most_header.decode("utf-8") + ", " + str(HeaderMssgType.SENDTOANDROID.value))
 					if(int(top_most_header.decode("utf-8")) == HeaderMssgType.SENDTOANDROID.value):
 						print("a-a--a-a--aAndroid wants to know if it got somethign")
 						send_radio_mssgs_to_android()
@@ -147,7 +145,7 @@ def send_radio_mssgs_to_android():
 		for mssg in received_xbee_mssg_que:
 			client.send(mssg)
 		received_xbee_mssg_que.clear()
-		radio_mssg_received = False
+	radio_mssg_received = False
 		 		
 	
 #Listen for mssgs on the radio device		
