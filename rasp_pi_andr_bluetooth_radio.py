@@ -130,10 +130,8 @@ def send_message():
 		print("Sending radio mssg: ", mssg)
 		for key, value in mssg.items():
 			if(device):
-				mssg_to_send = mssg["time"].encode("utf-8")\
-								"-".encode("utf-8")\ 
-								key.encode("utf-8")\ 
-								":".encode("utf-8")\
+				mssg_to_send = mssg["time"].encode("utf-8") + "-".encode("utf-8")\
+								key.encode("utf-8") + ":".encode("utf-8")\
 								value.encode("utf-8")
 				device.send_data_broadcast(mssg_to_send)
 	out_going_mssg_que.clear()
