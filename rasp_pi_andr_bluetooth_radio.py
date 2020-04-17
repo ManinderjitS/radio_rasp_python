@@ -123,11 +123,11 @@ def blth_listening_client_connection_data():
 
 ##The function that will send the mssg to the radio
 def send_message():	
-	print("-----------send msssg")
+	print("-----------send msssg: ")
 	global device, out_going_mssg_que	
 	for index1, mssg in enumerate(out_going_mssg_que):
 		print("Sending radio mssg: ", mssg)
-		for key, value in mssg.items():
+		for key, value in out_going_mssg_que.items():
 			if(device):
 				mssg_to_send = mssg["time"] + "-" + key + ":" + value
 				device.send_data_broadcast(mssg_to_send.encode("utf-8"))
@@ -138,6 +138,8 @@ def send_message():
 #bluetooth connection with the android		
 def send_radio_mssgs_to_android():
 	print("*****sending mssg from pi to phone")
+	print(type(mssges_recvd_from_xbee))
+	print(mssges_recvd_from_xbee)
 	global mssges_recvd_from_xbee, client, radio_mssg_received
 	if radio_mssg_received:
 		for key, value in mssges_recvd_from_xbee:
@@ -184,7 +186,6 @@ def listen_for_radio_mssgs():
 				mssges_recvd_from_xbee[mssg_header].append(received_mssg)
 				print(mssges_recvd_from_xbee, "\n\t", received_mssg)
 			# ~ send_radio_mssgs_to_android()
-			print("received mssg: " + received_mssg)
 		except Exception as e:
 			print(str(e))
 			# ~ send_mssg_driver(i)
