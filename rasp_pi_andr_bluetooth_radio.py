@@ -127,7 +127,7 @@ def send_message():
 	global device, out_going_mssg_que	
 	for index1, mssg in enumerate(out_going_mssg_que):
 		print("Sending radio mssg: ", mssg)
-		for key, value in out_going_mssg_que.items():
+		for key, value in mssg.items():
 			if(device):
 				mssg_to_send = mssg["time"] + "-" + key + ":" + value
 				device.send_data_broadcast(mssg_to_send.encode("utf-8"))
