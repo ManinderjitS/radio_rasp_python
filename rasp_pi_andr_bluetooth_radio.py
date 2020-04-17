@@ -138,9 +138,9 @@ def send_message():
 #bluetooth connection with the android		
 def send_radio_mssgs_to_android():
 	print("*****sending mssg from pi to phone")
+	global mssges_recvd_from_xbee, client, radio_mssg_received
 	print(type(mssges_recvd_from_xbee))
 	print(mssges_recvd_from_xbee)
-	global mssges_recvd_from_xbee, client, radio_mssg_received
 	if radio_mssg_received:
 		for key, value in mssges_recvd_from_xbee:
 			if(len(value) == 11):
