@@ -23,8 +23,7 @@ hostMACAddress = "B8:27:EB:0A:26:6F" #for bluetooth interface
 blueth_sock = object()
 client = object()
 clientInfo = object()
-received_android_mssg_que = [] 
-received_xbee_mssg_que = {}
+mssges_recvd_from_xbee = {}
 out_going_mssg_que = []
 radio_mssg_received = False
 got_a_mssg_to_send = False 
@@ -139,9 +138,9 @@ def send_message():
 #bluetooth connection with the android		
 def send_radio_mssgs_to_android():
 	print("*****sending mssg from pi to phone")
-	global received_xbee_mssg_que, client, radio_mssg_received
+	global mssges_recvd_from_xbee, client, radio_mssg_received
 	if radio_mssg_received:
-		for key, value in received_xbee_mssg_que:
+		for key, value in mssges_recvd_from_xbee:
 			if(len(value) == 11):
 				mssg = "{" ##This will be a string json object
 				for element in value:
@@ -149,16 +148,16 @@ def send_radio_mssgs_to_android():
 				mssg = mssg = "}" 
 				print("---sending back to client: " + mssg)
 				client.send(mssg)
-				del received_android_mssg_que[key]
+				del mssges_recvd_from_xbee[key]
 	
-	if not received_android_mssg_que:
+	if not mssges_recvd_from_xbee:
 		radio_mssg_received = False
 		 		
 	
 #Listen for mssgs on the radio device		
 def listen_for_radio_mssgs():
 	print("Listen for radio mssg")
-	global received_xbee_mssg_que, client, clientInfo, radio_mssg_received, got_a_mssg_to_send
+	global mssges_recvd_from_xbee, client, clientInfo, radio_mssg_received, got_a_mssg_to_send
 	#listen for mssg on radio for 60 sec  
 	i = 0
 	while 1:
@@ -174,16 +173,16 @@ def listen_for_radio_mssgs():
 			#client.send(mssg)
 			mssg_header = received_mssg[:received_mssg.find('-')]
 			received_mssg = received_mssg[received_mssg.find('-')+1:]
-			if(mssg_header in received_xbee_mssg_que):
+			if(mssg_header in mssges_recvd_from_xbee):
 				print("key exists")
-				received_xbee_mssg_que[mssg_header].append(received_mssg)
+				mssges_recvd_from_xbee[mssg_header].append(received_mssg)
 				radio_mssg_received = True
-				print(received_android_mssg_que[mssg_header])
+				print(mssges_recvd_from_xbee[mssg_header])
 			else:
 				print("key doesn't exist")
-				received_android_mssg_que[mssg_header] = []
-				received_android_mssg_que[mssg_header].append(received_mssg)
-				print(received_android_mssg_que, "\n\t", received_mssg)
+				mssges_recvd_from_xbee[mssg_header] = []
+				mssges_recvd_from_xbee[mssg_header].append(received_mssg)
+				print(mssges_recvd_from_xbee, "\n\t", received_mssg)
 			# ~ send_radio_mssgs_to_android()
 			print("received mssg: " + received_mssg)
 		except Exception as e:
