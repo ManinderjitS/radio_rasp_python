@@ -204,9 +204,9 @@ def send_mssg_driver(num_of_times):
 					"receiverName": "someName",
 					"senderId": "someID1",
 					"senderName": "someName1",
-					"latitude": "someLat",
-					"longitude": "123.123213",
-					"mssgType": "-123.123123",
+					"latitude": "123.123213",
+					"longitude": "-123.123213",
+					"mssgType": "1",
 					"isMyMssg": "True",
 				}
 	out_going_mssg_que.append(sample_mssg)				
