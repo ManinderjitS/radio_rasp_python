@@ -183,6 +183,7 @@ def listen_for_radio_mssgs():
 				print("key doesn't exist")
 				received_android_mssg_que[mssg_header] = []
 				received_android_mssg_que[mssg_header].append(received_mssg)
+				print(received_android_mssg_que, "\n\t", received_mssg)
 			# ~ send_radio_mssgs_to_android()
 			print("received mssg: " + received_mssg)
 		except Exception as e:
