@@ -175,8 +175,8 @@ def listen_for_radio_mssgs():
 			
 			if(last_time_mssg_sent_to_phone == 0):
 				time_now = int(round(time.time() * 1000)
-				send_radio_mssgs_to_android()
 				last_time_mssg_sent_to_phone = time_now
+				send_radio_mssgs_to_android()
 			else:
 				time_now = int(round(time.time() * 1000)
 				time_diff = time_now - last_time_mssg_sent_to_phone
