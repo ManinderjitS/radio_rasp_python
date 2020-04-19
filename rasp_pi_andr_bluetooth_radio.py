@@ -25,9 +25,10 @@ client = object()
 clientInfo = object()
 mssges_recvd_from_xbee = {}
 out_going_mssg_que = []
+last_time_mssg_sent_to_phone = 0
 radio_mssg_received = False
 got_a_mssg_to_send = False 
-android_wants_data = False
+
 
 #This class isn't being used yet
 class FuncThread(threading.Thread):
@@ -84,15 +85,11 @@ def blth_listening_client_connection_data():
 				if data:
 					print("Blth mssg received")
 					top_most_header = data[:data.find('-'.encode("utf-8"))]
-					if(int(top_most_header.decode("utf-8")) == HeaderMssgType.SENDTOANDROID.value):
-						print("a-a--a-a--aAndroid wants to know if it got somethign")
-						android_wants_data = True
-					else:
-						print("received data to send=-=-=-=-")
-						data = data[data.find('\n'.encode("utf-8"))+1:]
-						got_a_mssg_to_send = True
-						data_json = convert_data_to_json(data.decode("urf-8"))
-						out_going_mssg_que.append(data_json)
+					print("received data to send=-=-=-=-")
+					data = data[data.find('\n'.encode("utf-8"))+1:]
+					got_a_mssg_to_send = True
+					data_json = convert_data_to_json(data.decode("urf-8"))
+					out_going_mssg_que.append(data_json)
 					#~ send_message(data)					
 					#client.send(data) # Echo back to client
 			except Exception as e:
@@ -176,17 +173,18 @@ def listen_for_radio_mssgs():
 			
 			append_mssg_from_xbee(mssg_header, received_mssg)
 			
-			if(android_wants_data):
-				print("\tAndroid wants to know if it got something")
+			if(last_time_mssg_sent_to_phone == 0):
+				time_now = int(round(time.time() * 1000)
 				send_radio_mssgs_to_android()
-				android_wants_data = False
+				last_time_mssg_sent_to_phone = time_now
+			else:
+				time_now = int(round(time.time() * 1000)
+				if((time_now - last_time_mssg_sent_to_phone) > 20):
+					last_time_mssg_sent_to_phone = time_now
+					send_radio_mssgs_to_android()
 				
 		except Exception as e:
 			print(str(e))
-			if(android_wants_data):
-				print("\tAndroid wants to know if it got something")
-				send_radio_mssgs_to_android()
-				android_wants_data = False
 			# ~ send_mssg_driver(i)
 			i = i + 1
 			continue 
