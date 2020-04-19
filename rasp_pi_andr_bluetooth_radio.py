@@ -9,6 +9,7 @@ import bluetooth
 import threading
 import time
 import json
+import copy
 from digi.xbee.devices import XBeeDevice
 from enum import Enum
 
@@ -88,7 +89,7 @@ def blth_listening_client_connection_data():
 					print("received data to send=-=-=-=-")
 					data = data[data.find('\n'.encode("utf-8"))+1:]
 					got_a_mssg_to_send = True
-					data_json = convert_data_to_json(data.decode("urf-8"))
+					data_json = convert_data_to_json(data.decode("utf-8"))
 					out_going_mssg_que.append(data_json)
 					#~ send_message(data)					
 					#client.send(data) # Echo back to client
@@ -137,12 +138,13 @@ def send_radio_mssgs_to_android():
 	global mssges_recvd_from_xbee, client, radio_mssg_received, android_wants_data
 	
 	if radio_mssg_received and client:
-		for key, value in mssges_recvd_from_xbee.items():
+		copied_queue = copy.deepcopy(mssges_recvd_from_xbee)
+		for key, value in copied_queue.items():
 			if(len(value) == 11):
 				mssg = "{" ##This will be a string json object
 				for element in value:
 					mssg = mssg + element + ","
-				mssg = mssg = "}" 
+				mssg = mssg + "}" 
 				print("---sending back to client: ", mssg)
 				client.send(mssg)
 				# remove from the original
