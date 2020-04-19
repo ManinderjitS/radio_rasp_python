@@ -138,7 +138,7 @@ def send_message():
 #bluetooth connection with the android		
 def send_radio_mssgs_to_android():
 	print("*****sending mssg from pi to phone")
-	global mssges_recvd_from_xbee, client, radio_mssg_received
+	global mssges_recvd_from_xbee, client, radio_mssg_received, lock
 	with lock:
 		if radio_mssg_received:
 			for key, value in mssges_recvd_from_xbee.items():
@@ -213,7 +213,7 @@ def convert_data_to_json(data):
 
 ##This function will be run inside a function
 def append_mssg_from_xbee(mssg_header, received_mssg):
-	global mssges_recvd_from_xbee, radio_mssg_received
+	global mssges_recvd_from_xbee, radio_mssg_received, lock
 	with lock:
 		if(mssg_header in mssges_recvd_from_xbee):
 			print("\tappende_mssg thread: key exists")
