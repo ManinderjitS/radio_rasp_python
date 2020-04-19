@@ -73,7 +73,6 @@ def blth_listening_client_connection_data():
 	t1.start()
 	try:
 		client, clientInfo = blueth_sock.accept() 
-		send_radio_mssgs_to_android()
 		#start a second thread to send mssgs received from radio to the 
 		#android using bluetooth
 		t2 = threading.Thread(target=listen_for_radio_mssgs)
@@ -87,7 +86,7 @@ def blth_listening_client_connection_data():
 					top_most_header = data[:data.find('-'.encode("utf-8"))]
 					if(int(top_most_header.decode("utf-8")) == HeaderMssgType.SENDTOANDROID.value):
 						print("a-a--a-a--aAndroid wants to know if it got somethign")
-						send_radio_mssgs_to_android()
+						# ~ send_radio_mssgs_to_android()
 					else:
 						print("received data to send=-=-=-=-")
 						data = data[data.find('\n'.encode("utf-8"))+1:]
@@ -177,16 +176,11 @@ def listen_for_radio_mssgs():
 			#client.send(mssg)
 			mssg_header = received_mssg[:received_mssg.find('-')]
 			received_mssg = received_mssg[received_mssg.find('-')+1:]
-			if(mssg_header in mssges_recvd_from_xbee):
-				print("key exists")
-				mssges_recvd_from_xbee[mssg_header].append(received_mssg)
-				radio_mssg_received = True
-				print(mssges_recvd_from_xbee[mssg_header])
-			else:
-				print("key doesn't exist")
-				mssges_recvd_from_xbee[mssg_header] = []
-				mssges_recvd_from_xbee[mssg_header].append(received_mssg)
-				print(mssges_recvd_from_xbee, "\n\t", received_mssg)
+			
+			#start a thread which will take care of appending to the dictionary
+			t1 = threading.Thread(target=append_mssg_from_xbee, args=(mssg_header, received_mssg))
+			t1.start()
+			
 			# ~ send_radio_mssgs_to_android()
 		except Exception as e:
 			print(str(e))
@@ -219,6 +213,21 @@ def send_mssg_driver(num_of_times):
 def convert_data_to_json(data):
 	data_json = json.loads(data)
 	return(data_json)
+
+##This function will be run inside a function
+def append_mmsg_from_xbee(mssg_header, received_mssg):
+	global mssges_recvd_from_xbee, radio_mssg_received
+	with lock:
+		if(mssg_header in mssges_recvd_from_xbee):
+			print("\tappende_mssg thread: key exists")
+			mssges_recvd_from_xbee[mssg_header].append(received_mssg)
+			radio_mssg_received = True
+			print(mssges_recvd_from_xbee[mssg_header])
+		else:
+			print("\tappende_mssg thread: key doesn't exist")
+			mssges_recvd_from_xbee[mssg_header] = []
+			mssges_recvd_from_xbee[mssg_header].append(received_mssg)
+			print(mssges_recvd_from_xbee, "\n\t", received_mssg)
 
 ##This is the main function
 def main():
