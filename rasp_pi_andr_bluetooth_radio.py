@@ -142,7 +142,7 @@ def send_radio_mssgs_to_android():
 	print(type(mssges_recvd_from_xbee))
 	print(mssges_recvd_from_xbee)
 	if radio_mssg_received:
-		for key, value in mssges_recvd_from_xbee:
+		for key, value in mssges_recvd_from_xbee.items():
 			if(len(value) == 11):
 				mssg = "{" ##This will be a string json object
 				for element in value:
