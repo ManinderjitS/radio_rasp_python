@@ -215,7 +215,7 @@ def convert_data_to_json(data):
 	return(data_json)
 
 ##This function will be run inside a function
-def append_mmsg_from_xbee(mssg_header, received_mssg):
+def append_mssg_from_xbee(mssg_header, received_mssg):
 	global mssges_recvd_from_xbee, radio_mssg_received
 	with lock:
 		if(mssg_header in mssges_recvd_from_xbee):
