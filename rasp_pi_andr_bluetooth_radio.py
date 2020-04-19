@@ -183,6 +183,10 @@ def listen_for_radio_mssgs():
 				
 		except Exception as e:
 			print(str(e))
+			if(android_wants_data):
+				print("\tAndroid wants to know if it got something")
+				send_radio_mssgs_to_android()
+				android_wants_data = False
 			# ~ send_mssg_driver(i)
 			i = i + 1
 			continue 
