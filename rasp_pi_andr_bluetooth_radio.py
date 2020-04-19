@@ -86,7 +86,8 @@ def blth_listening_client_connection_data():
 					top_most_header = data[:data.find('-'.encode("utf-8"))]
 					if(int(top_most_header.decode("utf-8")) == HeaderMssgType.SENDTOANDROID.value):
 						print("a-a--a-a--aAndroid wants to know if it got somethign")
-						# ~ send_radio_mssgs_to_android()
+						t3 = threading.Thread(target=send_radio_mssgs_to_android)
+						t3.start()
 					else:
 						print("received data to send=-=-=-=-")
 						data = data[data.find('\n'.encode("utf-8"))+1:]
@@ -138,23 +139,21 @@ def send_message():
 def send_radio_mssgs_to_android():
 	print("*****sending mssg from pi to phone")
 	global mssges_recvd_from_xbee, client, radio_mssg_received
-	print(type(mssges_recvd_from_xbee))
-	print(mssges_recvd_from_xbee)
-	if radio_mssg_received:
-		temp_queue_holder = mssges_recvd_from_xbee
-		for key, value in temp_queue_holder.items():
-			if(len(value) == 11):
-				mssg = "{" ##This will be a string json object
-				for element in value:
-					mssg = mssg + element + ","
-				mssg = mssg = "}" 
-				print("---sending back to client: ", mssg)
-				client.send(mssg)
-				# remove from the original
-				del mssges_recvd_from_xbee[key]
-	
-	if not mssges_recvd_from_xbee:
-		radio_mssg_received = False
+	with lock:
+		if radio_mssg_received:
+			for key, value in mssges_recvd_from_xbee.items():
+				if(len(value) == 11):
+					mssg = "{" ##This will be a string json object
+					for element in value:
+						mssg = mssg + element + ","
+					mssg = mssg = "}" 
+					print("---sending back to client: ", mssg)
+					client.send(mssg)
+					# remove from the original
+					del mssges_recvd_from_xbee[key]
+		
+		if not mssges_recvd_from_xbee:
+			radio_mssg_received = False
 		 		
 	
 #Listen for mssgs on the radio device		
@@ -180,8 +179,6 @@ def listen_for_radio_mssgs():
 			#start a thread which will take care of appending to the dictionary
 			t1 = threading.Thread(target=append_mssg_from_xbee, args=(mssg_header, received_mssg))
 			t1.start()
-			
-			# ~ send_radio_mssgs_to_android()
 		except Exception as e:
 			print(str(e))
 			# ~ send_mssg_driver(i)
