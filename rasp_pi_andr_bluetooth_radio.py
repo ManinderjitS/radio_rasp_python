@@ -154,7 +154,7 @@ def send_radio_mssgs_to_android():
 #Listen for mssgs on the radio device		
 def listen_for_radio_mssgs():
 	print("Listen for radio mssg")
-	global mssges_recvd_from_xbee, client, clientInfo, radio_mssg_received, got_a_mssg_to_send, android_wants_data
+	global mssges_recvd_from_xbee, client, clientInfo, radio_mssg_received, got_a_mssg_to_send, last_time_mssg_sent_to_phone
 	#listen for mssg on radio for 60 sec  
 	i = 0
 	while 1:
@@ -179,12 +179,24 @@ def listen_for_radio_mssgs():
 				last_time_mssg_sent_to_phone = time_now
 			else:
 				time_now = int(round(time.time() * 1000)
-				if((time_now - last_time_mssg_sent_to_phone) > 20):
+				time_diff = time_now - last_time_mssg_sent_to_phone
+				if(time_diff > 20):
 					last_time_mssg_sent_to_phone = time_now
 					send_radio_mssgs_to_android()
 				
 		except Exception as e:
 			print(str(e))
+			
+			if(last_time_mssg_sent_to_phone == 0):
+				time_now = int(round(time.time() * 1000)
+				send_radio_mssgs_to_android()
+				last_time_mssg_sent_to_phone = time_now
+			else:
+				time_now = int(round(time.time() * 1000)
+				time_diff = time_now - last_time_mssg_sent_to_phone
+				if(time_diff > 20):
+					last_time_mssg_sent_to_phone = time_now
+					send_radio_mssgs_to_android()
 			# ~ send_mssg_driver(i)
 			i = i + 1
 			continue 
