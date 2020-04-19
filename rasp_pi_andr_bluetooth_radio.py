@@ -149,7 +149,7 @@ def send_radio_mssgs_to_android():
 				for element in value:
 					mssg = mssg + element + ","
 				mssg = mssg = "}" 
-				print("---sending back to client: " + mssg)
+				print("---sending back to client: ", mssg)
 				client.send(mssg)
 				# remove from the original
 				del mssges_recvd_from_xbee[key]
