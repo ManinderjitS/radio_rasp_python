@@ -27,7 +27,7 @@ mssges_recvd_from_xbee = {}
 out_going_mssg_que = []
 radio_mssg_received = False
 got_a_mssg_to_send = False 
-
+android_wants_data = False
 
 #This class isn't being used yet
 class FuncThread(threading.Thread):
@@ -86,8 +86,7 @@ def blth_listening_client_connection_data():
 					top_most_header = data[:data.find('-'.encode("utf-8"))]
 					if(int(top_most_header.decode("utf-8")) == HeaderMssgType.SENDTOANDROID.value):
 						print("a-a--a-a--aAndroid wants to know if it got somethign")
-						t3 = threading.Thread(target=send_radio_mssgs_to_android)
-						t3.start()
+						android_wants_data = True
 					else:
 						print("received data to send=-=-=-=-")
 						data = data[data.find('\n'.encode("utf-8"))+1:]
@@ -138,8 +137,8 @@ def send_message():
 #bluetooth connection with the android		
 def send_radio_mssgs_to_android():
 	print("*****sending mssg from pi to phone")
-	global mssges_recvd_from_xbee, client, radio_mssg_received
-	lock.acquire()
+	global mssges_recvd_from_xbee, client, radio_mssg_received, android_wants_data
+	
 	if radio_mssg_received:
 		for key, value in mssges_recvd_from_xbee.items():
 			if(len(value) == 11):
@@ -153,14 +152,12 @@ def send_radio_mssgs_to_android():
 				del mssges_recvd_from_xbee[key]
 	
 	if not mssges_recvd_from_xbee:
-		radio_mssg_received = False
-	lock.release()
-		 		
+		radio_mssg_received = False 		
 	
 #Listen for mssgs on the radio device		
 def listen_for_radio_mssgs():
 	print("Listen for radio mssg")
-	global mssges_recvd_from_xbee, client, clientInfo, radio_mssg_received, got_a_mssg_to_send
+	global mssges_recvd_from_xbee, client, clientInfo, radio_mssg_received, got_a_mssg_to_send, android_wants_data
 	#listen for mssg on radio for 60 sec  
 	i = 0
 	while 1:
@@ -177,9 +174,13 @@ def listen_for_radio_mssgs():
 			mssg_header = received_mssg[:received_mssg.find('-')]
 			received_mssg = received_mssg[received_mssg.find('-')+1:]
 			
-			#start a thread which will take care of appending to the dictionary
-			t1 = threading.Thread(target=append_mssg_from_xbee, args=(mssg_header, received_mssg))
-			t1.start()
+			append_mssg_from_xbee(mssg_header, received_mssg)
+			
+			if(android_wants_data):
+				print("\tAndroid wants to know if it got something")
+				send_radio_mssgs_to_android()
+				android_wants_data = False
+				
 		except Exception as e:
 			print(str(e))
 			# ~ send_mssg_driver(i)
@@ -215,7 +216,7 @@ def convert_data_to_json(data):
 ##This function will be run inside a function
 def append_mssg_from_xbee(mssg_header, received_mssg):
 	global mssges_recvd_from_xbee, radio_mssg_received
-	lock.acquire()
+	
 	if(mssg_header in mssges_recvd_from_xbee):
 		print("\tappende_mssg thread: key exists")
 		mssges_recvd_from_xbee[mssg_header].append(received_mssg)
@@ -226,7 +227,6 @@ def append_mssg_from_xbee(mssg_header, received_mssg):
 		mssges_recvd_from_xbee[mssg_header] = []
 		mssges_recvd_from_xbee[mssg_header].append(received_mssg)
 		print(mssges_recvd_from_xbee, "\n\t", received_mssg)
-	lock.release()
 
 ##This is the main function
 def main():
