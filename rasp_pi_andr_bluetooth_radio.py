@@ -171,35 +171,22 @@ def listen_for_radio_mssgs():
 			mssg_header = received_mssg[:received_mssg.find('-')]
 			received_mssg = received_mssg[received_mssg.find('-')+1:]
 			
-			append_mssg_from_xbee(mssg_header, received_mssg)
-			
-			if(last_time_mssg_sent_to_phone == 0):
-				time_now = int(round(time.time() * 1000))
-				last_time_mssg_sent_to_phone = time_now
-				send_radio_mssgs_to_android()
-			else:
-				time_now = int(round(time.time() * 1000))
-				time_diff = time_now - last_time_mssg_sent_to_phone
-				if(time_diff > 20):
-					last_time_mssg_sent_to_phone = time_now
-					send_radio_mssgs_to_android()
-				
+			append_mssg_from_xbee(mssg_header, received_mssg)			
 		except Exception as e:
 			print(str(e))
-			
-			if(last_time_mssg_sent_to_phone == 0):
-				time_now = int(round(time.time() * 1000))
-				send_radio_mssgs_to_android()
-				last_time_mssg_sent_to_phone = time_now
-			else:
-				time_now = int(round(time.time() * 1000))
-				time_diff = time_now - last_time_mssg_sent_to_phone
-				if(time_diff > 20):
-					last_time_mssg_sent_to_phone = time_now
-					send_radio_mssgs_to_android()
 			# ~ send_mssg_driver(i)
-			i = i + 1
-			continue 
+			
+		if(last_time_mssg_sent_to_phone == 0):
+			time_now = int(round(time.time() * 1000))
+			send_radio_mssgs_to_android()
+			last_time_mssg_sent_to_phone = time_now
+		else:
+			time_now = int(round(time.time() * 1000))
+			time_diff = time_now - last_time_mssg_sent_to_phone
+			if(time_diff > 20):
+				last_time_mssg_sent_to_phone = time_now
+				send_radio_mssgs_to_android()
+		i = i + 1
 
 #This function is creating for testing purposes, 
 #	its purpose is to send dummy data 
