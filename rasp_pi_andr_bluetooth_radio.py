@@ -166,7 +166,7 @@ def listen_for_radio_mssgs():
 		print("Listening for radio mssgs")
 		if got_a_mssg_to_send:
 			print("There is a mssg to send from the client")
-			send_message()
+			send_message_through_radio()
 		try:
 			mssg = device.read_data(10)					
 			received_mssg = mssg.data.decode("utf-8")
