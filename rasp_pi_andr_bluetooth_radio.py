@@ -24,7 +24,7 @@ hostMACAddress = "B8:27:EB:0A:26:6F" #for bluetooth interface
 blueth_sock = object()
 client = None
 clientInfo = object()
-mssges_recvd_from_xbee = {}
+in_coming_mssg_que = {}
 out_going_mssg_que = []
 last_time_mssg_sent_to_phone = 0
 radio_mssg_received = False
@@ -119,7 +119,7 @@ def blth_listening_client_connection_data():
 		#~ print("The file doesn't exist. \n\tCheck bluetooth connection with phone.")
 
 ##The function that will send the mssg to the radio
-def send_message():	
+def send_message_through_radio():	
 	print("-----------send msssg: ")
 	global device, out_going_mssg_que	
 	for index1, mssg in enumerate(out_going_mssg_que):
@@ -135,28 +135,31 @@ def send_message():
 #bluetooth connection with the android		
 def send_radio_mssgs_to_android():
 	print("*****sending mssg from pi to phone")
-	global mssges_recvd_from_xbee, client, radio_mssg_received, android_wants_data
+	global in_coming_mssg_que, client, radio_mssg_received, android_wants_data
 	
 	if radio_mssg_received and client:
-		copied_queue = copy.deepcopy(mssges_recvd_from_xbee)
+		copied_queue = copy.deepcopy(in_coming_mssg_que)
 		for key, value in copied_queue.items():
 			if(len(value) == 11):
 				mssg = "{" ##This will be a string json object
-				for element in value:
-					mssg = mssg + element + ","
+				for index, element in enumerate(value):
+					if index < len(value) - 1:
+						mssg = mssg + element + ","
+					elif index == len(value) - 1:
+						mssg = mssg + element
 				mssg = mssg + "}" 
 				print("---sending back to client: ", mssg)
 				client.send(mssg)
 				# remove from the original
-				del mssges_recvd_from_xbee[key]
+				del in_coming_mssg_que[key]
 	
-	if not mssges_recvd_from_xbee:
+	if not in_coming_mssg_que:
 		radio_mssg_received = False 		
 	
 #Listen for mssgs on the radio device		
 def listen_for_radio_mssgs():
 	print("Listen for radio mssg")
-	global mssges_recvd_from_xbee, client, clientInfo, radio_mssg_received, got_a_mssg_to_send, last_time_mssg_sent_to_phone
+	global in_coming_mssg_que, client, clientInfo, radio_mssg_received, got_a_mssg_to_send, last_time_mssg_sent_to_phone
 	#listen for mssg on radio for 60 sec  
 	i = 0
 	while 1:
@@ -214,22 +217,27 @@ def send_mssg_driver(num_of_times):
 ##This function converts the string received to json
 def convert_data_to_json(data):
 	data_json = json.loads(data)
+	print(data,"\n\t", data_json)
 	return(data_json)
 
 ##This function will be run inside a function
 def append_mssg_from_xbee(mssg_header, received_mssg):
-	global mssges_recvd_from_xbee, radio_mssg_received
+	global in_coming_mssg_que, radio_mssg_received
 	
-	if(mssg_header in mssges_recvd_from_xbee):
+	##The message is the time of this received message. Since the message 
+	##	is received in parts, we wanna put it together correctly, and since 
+	##	the time of the message will be a unique value, it is a good key to 
+	##	use for collecting the message together inside the message_recvg_fom_xbee dictionary
+	if(mssg_header in in_coming_mssg_que):
 		print("\tappende_mssg thread: key exists")
-		mssges_recvd_from_xbee[mssg_header].append(received_mssg)
+		in_coming_mssg_que[mssg_header].append(received_mssg)
 		radio_mssg_received = True
-		print(mssges_recvd_from_xbee[mssg_header])
+		print(in_coming_mssg_que[mssg_header])
 	else:
 		print("\tappende_mssg thread: key doesn't exist")
-		mssges_recvd_from_xbee[mssg_header] = []
-		mssges_recvd_from_xbee[mssg_header].append(received_mssg)
-		print(mssges_recvd_from_xbee, "\n\t", received_mssg)
+		in_coming_mssg_que[mssg_header] = []
+		in_coming_mssg_que[mssg_header].append(received_mssg)
+		print(in_coming_mssg_que, "\n\t", received_mssg)
 
 ##This is the main function
 def main():
