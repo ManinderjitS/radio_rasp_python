@@ -204,7 +204,7 @@ def send_mssg_driver(num_of_times):
 					"mssgText": "hello there, " + str(num_of_times),
 					"receiverId": "someID",
 					"receiverName": "someName",
-					"senderId": "eu1REmVDSFCzpU2vwdEsVZ:APA91bEi30B2I28GbQ7D6-gJWfkMmAxEccCvNqeZJQoGyhf1UzHIdZxYX7gzjRnpRszebvX4dr04s6gbOuT4zMHubPRciIBtzVkQr9r_rL_o76r0FX6bh_vE7mcBrECedUAhPB68kAjR",
+					"senderId": "9fb4464d35109faca1005d060878a125",
 					"senderName": "someName1",
 					"latitude": "123.123213",
 					"longitude": "-123.123213",
