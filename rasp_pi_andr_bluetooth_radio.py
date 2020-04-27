@@ -126,7 +126,7 @@ def send_message_through_radio():
 		print("Sending radio mssg: ", mssg)
 		for key, value in mssg.items():
 			if(device):
-				mssg_to_send = mssg["time"] + "-" + key + ":" + value
+				mssg_to_send = mssg["time"] + "-" + '"' + key + '"' + ":" + '"' + value + '"'
 				device.send_data_broadcast(mssg_to_send.encode("utf-8"))
 	out_going_mssg_que.clear()
 	got_a_mssg_to_send = False
