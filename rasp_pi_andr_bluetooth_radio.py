@@ -10,7 +10,7 @@ import threading
 import time
 import urllib.request
 from digi.xbee.devices import XBeeDevice
-from firebase import Firebase
+# ~ from firebase import Firebase
 
 config = {
 	"apiKey": "AAAAOmudVDY:APA91bFzPVjJUwca9fg8jvC4LUOlzeDjzPUYANcXns-Vcx8QtPZBMFAkE-OGu4Dgq42SUkGIPUwYMIXZ3MIBdYpPM7gBggj3NrJL-0fPNK012X6-KBtCO3NBjzaQ_PlcUevmnveT1Tcv",
@@ -92,6 +92,7 @@ def listening_client_connection_data():
 		t2.start()
 		while 1:
 			try:
+				print("Wating for bluetooth data")
 				data = client.recv(size)
 				if data:
 					print(data)
@@ -128,7 +129,7 @@ def send_message(mssg):
 	global device	
 	##If this device has internet connection then send the mssg to firebase
 	if(connected_to_internet):
-		write_to_firebase(mssg):
+		write_to_firebase(mssg)
 	else if(device):## If there is no internet connection then send the mssg to other devices
 		device.send_data_broadcast(mssg)
 		
