@@ -81,8 +81,8 @@ def listening_client_connection_data():
 	size = 1024
 	
 	#start another thread for function which listens for incoming radio mssgs
-	t1 = threading.Thread(target=listen_for_radio_mssgs)
-	t1.start()
+	# ~ t1 = threading.Thread(target=listen_for_radio_mssgs)
+	# ~ t1.start()
 	try:
 		client, clientInfo = blueth_sock.accept()
 		print("Client connected: listening for data.")  
