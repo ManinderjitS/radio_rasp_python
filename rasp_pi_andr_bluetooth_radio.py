@@ -8,7 +8,29 @@ import time
 import bluetooth
 import threading
 import time
+import urllib.request
 from digi.xbee.devices import XBeeDevice
+from firebase import Firebase
+
+config = {
+	"apiKey": "AAAAOmudVDY:APA91bFzPVjJUwca9fg8jvC4LUOlzeDjzPUYANcXns-Vcx8QtPZBMFAkE-OGu4Dgq42SUkGIPUwYMIXZ3MIBdYpPM7gBggj3NrJL-0fPNK012X6-KBtCO3NBjzaQ_PlcUevmnveT1Tcv",
+	"authDomain": "projectId.firebaseapp.com",
+	"databaseURL": "https://databaseName.firebaseio.com",
+	"storageBucket": "projectId.appspot.com"
+}
+
+firebaseConfig = {
+	"apiKey": "AIzaSyAveH6IX7dyPiEZUGoJSacxjEtSWS7JeOk",
+	"authDomain": "boreas-bf0bb.firebaseapp.com",
+	"databaseURL": "https://boreas-bf0bb.firebaseio.com",
+	"projectId": "boreas-bf0bb",
+	"storageBucket": "boreas-bf0bb.appspot.com",
+	"messagingSenderId": "250913575990",
+	"appId": "1:250913575990:web:67c9d30e9bbbdf13127497",
+	"measurementId": "G-K85HHXB3EP"
+}
+
+firebase = Firebase(firebaseConfig)
 
 lock = threading.Lock()
 
@@ -101,10 +123,13 @@ def listening_client_connection_data():
 	#~ else:
 		#~ print("The file doesn't exist. \n\tCheck bluetooth connection with phone.")
 
-##The function that will send the mssg to the radio
+##The function that will send the mssg through the radio device
 def send_message(mssg):
 	global device	
-	if(device):
+	##If this device has internet connection then send the mssg to firebase
+	if(connected_to_internet):
+		write_to_firebase(mssg):
+	else if(device):## If there is no internet connection then send the mssg to other devices
 		device.send_data_broadcast(mssg)
 		
 #This method sends data received from xbee to android using Pi's 
@@ -147,6 +172,16 @@ def main():
 		 
 	##Closing the connection
 	device.close()
+	
+		
+##This function checks if there is an internet connection
+def connected_to_internet(host='http://google.com'):
+    try:
+        urllib.request.urlopen(host) #Python 3.x
+        return True
+    except:
+        return False
+
 
 ##Letting the Python interpreter about the main function
 if __name__ == "__main__":
