@@ -94,7 +94,7 @@ def listening_client_connection_data():
 			try:
 				print("Wating for bluetooth data")
 				data = client.recv(size)
-				print(data)
+				print(client)
 				if data:
 					print(data.decode("utf-8"))
 					send_message(data)
