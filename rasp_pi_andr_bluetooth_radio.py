@@ -30,7 +30,7 @@ firebaseConfig = {
 	"measurementId": "G-K85HHXB3EP"
 }
 
-firebase = Firebase(firebaseConfig)
+# ~ firebase = Firebase(firebaseConfig)
 
 lock = threading.Lock()
 
