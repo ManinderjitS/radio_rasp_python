@@ -24,7 +24,7 @@ hostMACAddress = "B8:27:EB:0A:26:6F" #for bluetooth interface
 blueth_sock = object()
 client = None
 clientInfo = object()
-in_coming_mssg_que = {}
+in_coming_mssg_que = []
 out_going_mssg_que = []
 last_time_mssg_sent_to_phone = 0
 radio_mssg_received = False
@@ -48,7 +48,7 @@ def xbee_instance():
 		device = XBeeDevice("/dev/ttyUSB2", 9600)
 		device.open()
 	except Exception as e:
-		print(str(e))
+                print(str(e))
 	
 
 ##This function makes a bluetooth socket 
@@ -84,15 +84,9 @@ def blth_listening_client_connection_data():
 			try:
 				data = client.recv(size)
 				if data:
-					print("Blth mssg received")
-					top_most_header = data[:data.find('-'.encode("utf-8"))]
-					print("received data to send=-=-=-=-")
-					data = data[data.find('\n'.encode("utf-8"))+1:]
-					got_a_mssg_to_send = True
-					data_json = convert_data_to_json(data.decode("utf-8"))
-					out_going_mssg_que.append(data_json)
-					#~ send_message(data)					
-					#client.send(data) # Echo back to client
+                                        print("Bluetooth received data to send=-=-=-=-: " + data)
+                                        got_a_mssg_to_send = True
+					out_going_mssg_que.append(data)
 			except Exception as e:
 				print(str(e))
 		t1.join()
@@ -122,12 +116,10 @@ def blth_listening_client_connection_data():
 def send_message_through_radio():	
 	print("-----------send msssg: ")
 	global device, out_going_mssg_que	
-	for index1, mssg in enumerate(out_going_mssg_que):
+	for index, mssg in enumerate(out_going_mssg_que):
 		print("Sending radio mssg: ", mssg)
-		for key, value in mssg.items():
-			if(device):
-				mssg_to_send = mssg["time"] + "-" + '"' + key + '"' + ":" + '"' + value + '"'
-				device.send_data_broadcast(mssg_to_send.encode("utf-8"))
+		if(device):
+			device.send_data_broadcast(mssg.encode("utf-8"))
 	out_going_mssg_que.clear()
 	got_a_mssg_to_send = False
 		
@@ -138,20 +130,11 @@ def send_radio_mssgs_to_android():
 	global in_coming_mssg_que, client, radio_mssg_received, android_wants_data
 	
 	if radio_mssg_received and client:
-		copied_queue = copy.deepcopy(in_coming_mssg_que)
-		for key, value in copied_queue.items():
-			if(len(value) == 11):
-				mssg = "{" ##This will be a string json object
-				for index, element in enumerate(value):
-					if index < len(value) - 1:
-						mssg = mssg + element + ","
-					elif index == len(value) - 1:
-						mssg = mssg + element
-				mssg = mssg + "}" 
-				print("---sending back to client: ", mssg)
-				client.send(mssg)
-				# remove from the original
-				del in_coming_mssg_que[key]
+		for indx, mssg in in_coming_mssg_que:
+	        	print("---sending back to client: ", mssg)
+			client.send(mssg)
+			# remove from the original
+			del in_coming_mssg_que[indx]
 	
 	if not in_coming_mssg_que:
 		radio_mssg_received = False 		
@@ -170,13 +153,7 @@ def listen_for_radio_mssgs():
 		try:
 			mssg = device.read_data(10)					
 			received_mssg = mssg.data.decode("utf-8")
-			#~ with lock:
-				#~ print("The lock thing")
-			#client.send(mssg)
-			mssg_header = received_mssg[:received_mssg.find('-')]
-			received_mssg = received_mssg[received_mssg.find('-')+1:]
-			
-			append_mssg_from_xbee(mssg_header, received_mssg)			
+	                in_coming_mssg_que.append(received_mssg)
 		except Exception as e:
 			print(str(e))
 			# ~ send_mssg_driver(i)
@@ -221,23 +198,11 @@ def convert_data_to_json(data):
 	return(data_json)
 
 ##This function will be run inside a function
-def append_mssg_from_xbee(mssg_header, received_mssg):
+def append_mssg_from_xbee(received_mssg):
 	global in_coming_mssg_que, radio_mssg_received
 	
-	##The message is the time of this received message. Since the message 
-	##	is received in parts, we wanna put it together correctly, and since 
-	##	the time of the message will be a unique value, it is a good key to 
-	##	use for collecting the message together inside the message_recvg_fom_xbee dictionary
-	if(mssg_header in in_coming_mssg_que):
-		print("\tappende_mssg thread: key exists")
-		in_coming_mssg_que[mssg_header].append(received_mssg)
-		radio_mssg_received = True
-		print(in_coming_mssg_que[mssg_header])
-	else:
-		print("\tappende_mssg thread: key doesn't exist")
-		in_coming_mssg_que[mssg_header] = []
-		in_coming_mssg_que[mssg_header].append(received_mssg)
-		print(in_coming_mssg_que, "\n\t", received_mssg)
+	print("\tappende_mssg thread: " + received_mssg)
+	radio_mssg_received = True
 
 ##This is the main function
 def main():
