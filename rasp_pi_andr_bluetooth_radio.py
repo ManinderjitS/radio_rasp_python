@@ -128,9 +128,9 @@ def listening_client_connection_data():
 def send_message(mssg):
 	global device	
 	##If this device has internet connection then send the mssg to firebase
-	if(connected_to_internet):
-		write_to_firebase(mssg)
-	else if(device):## If there is no internet connection then send the mssg to other devices
+	# ~ if(connected_to_internet):
+		# ~ write_to_firebase(mssg)
+	if(device):## If there is no internet connection then send the mssg to other devices
 		device.send_data_broadcast(mssg)
 		
 #This method sends data received from xbee to android using Pi's 
