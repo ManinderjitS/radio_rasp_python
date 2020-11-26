@@ -90,7 +90,7 @@ def blth_listening_client_connection_data():
 					data = client.recv(size)
 					if data:
 						data_str = data.decode("utf-8")
-						if(data_str == MssgType.DONESENDINGDATA):
+						if(data_str == "DONE"):
 							print("\n\t\t\tdone yo")
 							break
 						print("\nBlth data received: " + data_str)
