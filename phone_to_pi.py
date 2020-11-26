@@ -50,7 +50,7 @@ def wait_for_data():
 	size = 1024
 	
 	try: 
-		while client:
+		while 1:
 			print("Bluetooth connected: listening for data.") 
 			try:
 				print("\twaiting for data")
@@ -60,6 +60,7 @@ def wait_for_data():
 					if(data_str == MssgType.DONESENDINGDATA):
 						print("final mssg for this package recieved, closing socket")
 						client.close()
+						break
 					print("\nBlth data received: " + data_str)
 					out_going_mssg_que.append(data_str)
 					got_a_mssg_to_send = True
