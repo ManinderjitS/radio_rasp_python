@@ -4,9 +4,10 @@ import bluetooth
 
 from enum import Enum
 
-class HeaderMssgType(Enum):
-     SENDTOOUTSIDEWORLD = 1
-     SENDTOANDROID = 4
+class MssgType(Enum):
+	DONESENDINGDATA = "DONE"
+	SENDTOOUTSIDEWORLD = 1
+	SENDTOANDROID = 4
     
 hostMACAddress = "B8:27:EB:0A:26:6F" #for bluetooth interface
 blueth_sock = object()
@@ -33,33 +34,41 @@ def bluetooth_socket_binding():
 
 
 #In our case the client almost always will be an Android device 
-def blth_listening_client_connection_data():
+def wait_for_clients():
 	print(">>>>>listen client on bluth")
 	global blueth_sock, client, clientInfo, got_a_mssg_to_send, out_going_mssg_que
 	size = 1024
 	
+	client, clientInfo = blueth_sock.accept()
+	
 	try: 
 		while 1:
-			client, clientInfo = blueth_sock.accept()
 			print("main thread - - - - - - Bluetooth connected: listening for data.") 
 			try:
-				data = client.recv(size)
-				if data:
-					data_str = data.decode("utf-8")
-					print("\nBlth data received: " + data_str)
-					out_going_mssg_que.append(data_str)
-					got_a_mssg_to_send = True
+				wait_for_data()
 			except Exception as e:
 				print("bluetooth inner exception : ")
 				print(str(e))
-		t1.join()
 	except Exception as e:	
 		print("[Closing socket] ")
 		print(e)
 		client.close()
 		blueth_sock.close()
 
-
+def wait_for_data():
+	global blueth_sock, client, clientInfo, got_a_mssg_to_send, out_going_mssg_que
+	
+	print("\twaiting for data")
+	data = client.recv(size)
+	if data:
+		data_str = data.decode("utf-8")
+		if(data_str == MssgType.DONESENDINGDATA):
+			print("final mssg for this package recieved, closing socket")
+			client.close()
+			wait_for_clients()
+		print("\nBlth data received: " + data_str)
+		out_going_mssg_que.append(data_str)
+		got_a_mssg_to_send = True
 
 # ~ #This method sends data received from xbee to android using Pi's 
 # ~ #bluetooth connection with the android		
@@ -85,7 +94,7 @@ def main():
 	##Make a bluetooth socket
 	bluetooth_socket_binding()
 	##Start listening for connection
-	blth_listening_client_connection_data()
+	wait_for_clients()
 
 
 ##Letting the Python interpreter about the main function
