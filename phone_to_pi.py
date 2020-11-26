@@ -38,9 +38,9 @@ def blth_listening_client_connection_data():
 	global blueth_sock, client, clientInfo, got_a_mssg_to_send, out_going_mssg_que
 	size = 1024
 	
-	try:
-		client, clientInfo = blueth_sock.accept() 
+	try: 
 		while 1:
+			client, clientInfo = blueth_sock.accept()
 			print("main thread - - - - - - Bluetooth connected: listening for data.") 
 			try:
 				data = client.recv(size)
