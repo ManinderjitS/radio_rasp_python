@@ -79,6 +79,7 @@ def blth_listening_client_connection_data():
 	t1.start()
 	while 1:
 		try:
+			print("wating for clients:")
 			client, clientInfo = blueth_sock.accept() 
 			#start a second thread to send mssgs received from radio to the android using bluetooth
 			t2 = threading.Thread(target=listen_for_radio_mssgs)
@@ -98,6 +99,7 @@ def blth_listening_client_connection_data():
 				except Exception as e:
 					print("bluetooth inner exception : ")
 					print(str(e))
+					client.close()
 					break
 			t1.join()
 		except Exception as e:	

@@ -68,6 +68,7 @@ def wait_for_data():
 			except Exception as e:
 				print("bluetooth inner exception : ")
 				print(str(e))
+				client.close()
 				break
 	except Exception as e:	
 		print("[Closing socket] ")
