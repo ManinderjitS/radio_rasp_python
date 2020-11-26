@@ -97,11 +97,11 @@ def blth_listening_client_connection_data():
 						out_going_mssg_que.append(data_str)
 						got_a_mssg_to_send = True
 				except Exception as e:
-					print("bluetooth inner exception : ")
 					print(str(e))
+					print("bluetooth inner exception closing client")
 					client.close()
 					break
-			t1.join()
+			
 		except Exception as e:	
 			print("[Closing socket]: " + e)
 			client.close()
@@ -111,6 +111,7 @@ def blth_listening_client_connection_data():
 		#wait for new client	
 		client.close()
 	
+	t1.join()
 	blueth_sock.close()
 
 ##This function sends the mssges thru the radio to the outside world
