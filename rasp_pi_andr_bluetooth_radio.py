@@ -131,7 +131,7 @@ def send_message_through_radio():
 			try:
 				device.send_data_broadcast(mssg)
 				#Wait 2 sec before sending another package
-				#time.sleep(5)
+				time.sleep(1)
 			except Exception as e:
 				print("Radio exception: ")
 				print(str(e))
@@ -172,6 +172,7 @@ def listen_for_radio_mssgs():
 			received_mssg = mssg.data.decode("utf-8")
 			print("recieved from radio: " + received_mssg)
 			in_coming_mssg_que.append(received_mssg)
+			radio_mssg_received = True
 		except Exception as e:
 			print("incoming message --- exception")
 			print(str(e))
