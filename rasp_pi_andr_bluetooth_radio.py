@@ -14,9 +14,10 @@ import traceback
 from digi.xbee.devices import XBeeDevice
 from enum import Enum
 
-class HeaderMssgType(Enum):
-     SENDTOOUTSIDEWORLD = 1
-     SENDTOANDROID = 4
+class MssgType(Enum):
+	DONESENDINGDATA = "DONE"
+	SENDTOOUTSIDEWORLD = 1
+	SENDTOANDROID = 4
 
 lock = threading.Lock()
 
@@ -76,28 +77,37 @@ def blth_listening_client_connection_data():
 	#start another thread for function which listens for incoming radio mssgs
 	t1 = threading.Thread(target=listen_for_radio_mssgs)
 	t1.start()
-	try:
-		client, clientInfo = blueth_sock.accept() 
-		#start a second thread to send mssgs received from radio to the android using bluetooth
-		t2 = threading.Thread(target=listen_for_radio_mssgs)
-		t2.start()
-		while 1:
-			print("main thread - - - - - - Bluetooth connected: listening for data.") 
-			try:
-				data = client.recv(size)
-				if data:
-					data_str = data.decode("utf-8")
-					print("\nBlth data received: " + data_str)
-					out_going_mssg_que.append(data_str)
-					got_a_mssg_to_send = True
-			except Exception as e:
-				print("bluetooth inner exception : ")
-				print(str(e))
-		t1.join()
-	except Exception as e:	
-		print("[Closing socket]: " + e)
+	while 1:
+		try:
+			client, clientInfo = blueth_sock.accept() 
+			#start a second thread to send mssgs received from radio to the android using bluetooth
+			t2 = threading.Thread(target=listen_for_radio_mssgs)
+			t2.start()
+			while 1:
+				print("main thread - - - - - - Bluetooth connected: listening for data.") 
+				try:
+					data = client.recv(size)
+					if data:
+						data_str = data.decode("utf-8")
+						if(data_str == MssgType.DONESENDINGDATA):
+							print("\n\t\t\tdone yo")
+							break
+						print("\nBlth data received: " + data_str)
+						out_going_mssg_que.append(data_str)
+						got_a_mssg_to_send = True
+				except Exception as e:
+					print("bluetooth inner exception : ")
+					print(str(e))
+			t1.join()
+		except Exception as e:	
+			print("[Closing socket]: " + e)
+			client.close()
+			blueth_sock.close()
+		
+		#wait for new client	
 		client.close()
-		blueth_sock.close()
+	
+	blueth_sock.close()
 
 ##This function sends the mssges thru the radio to the outside world
 def send_message_through_radio():	
