@@ -72,7 +72,6 @@ def send_radio_mssgs_to_android():
 def main():
 	print("Begining the execution of the file here")
 	##Instantiate the xbee device
-	xbee_instance()
 	##Make a bluetooth socket
 	bluetooth_socket_binding()
 	##Start listening for connection
