@@ -86,8 +86,9 @@ def blth_listening_client_connection_data():
 			try:
 				data = client.recv(size)
 				if data:
-					print("\nBlth data received: " + data.decode("utf-8"))
-					out_going_mssg_que.append(data)
+					data_str = data.decode("utf-8")
+					print("\nBlth data received: " + data_str)
+					out_going_mssg_que.append(data_str)
 					got_a_mssg_to_send = True
 			except Exception as e:
 				print("bluetooth inner exception : ")
