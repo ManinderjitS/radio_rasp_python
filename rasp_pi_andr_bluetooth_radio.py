@@ -88,7 +88,7 @@ def blth_listening_client_connection_data():
 					out_going_mssg_que.append(data)
 					got_a_mssg_to_send = True
 			except Exception as e:
-				print("bluetooth inner exception : " + str(traceback.print_exc()))
+				print("bluetooth inner exception : ")
 				print(str(e))
 		t1.join()
 	except Exception as e:	
@@ -107,7 +107,7 @@ def send_message_through_radio():
 				device.send_data_broadcast(mssg)
 				del out_going_mssg_que[index]
 			except Exception as e:
-				print("Radio exception: " + str(traceback.print_exc()))
+				print("Radio exception: ")
 				print(str(e))
 	
 	got_a_mssg_to_send = False
