@@ -41,6 +41,9 @@ def wait_for_clients():
 	client, clientInfo = blueth_sock.accept()
 	
 	
+	wait_for_data()
+	
+	
 
 def wait_for_data():
 	global blueth_sock, client, clientInfo, got_a_mssg_to_send, out_going_mssg_que
