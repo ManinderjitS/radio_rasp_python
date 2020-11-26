@@ -8,6 +8,14 @@ class HeaderMssgType(Enum):
      SENDTOOUTSIDEWORLD = 1
      SENDTOANDROID = 4
     
+hostMACAddress = "B8:27:EB:0A:26:6F" #for bluetooth interface
+blueth_sock = object()
+client = None
+clientInfo = object()
+out_going_mssg_que = []
+last_time_mssg_sent_to_phone = 0
+got_a_mssg_to_send = False
+
      
 ##This function makes a bluetooth socket 
 def bluetooth_socket_binding():
@@ -52,21 +60,21 @@ def blth_listening_client_connection_data():
 
 
 
-#This method sends data received from xbee to android using Pi's 
-#bluetooth connection with the android		
-def send_radio_mssgs_to_android():
-	global in_coming_mssg_que, client, radio_mssg_received, android_wants_data
+# ~ #This method sends data received from xbee to android using Pi's 
+# ~ #bluetooth connection with the android		
+# ~ def send_radio_mssgs_to_android():
+	# ~ global in_coming_mssg_que, client, radio_mssg_received, android_wants_data
 	
-	if radio_mssg_received and client:
-		print("*****sending mssg from pi to phone")
-		for index, mssg in enumerate(in_coming_mssg_que):
-			print("---sending back to client: ", mssg)
-			client.send(mssg)
-			# remove from the original
-			del in_coming_mssg_que[index]
+	# ~ if radio_mssg_received and client:
+		# ~ print("*****sending mssg from pi to phone")
+		# ~ for index, mssg in enumerate(in_coming_mssg_que):
+			# ~ print("---sending back to client: ", mssg)
+			# ~ client.send(mssg)
+			# ~ # remove from the original
+			# ~ del in_coming_mssg_que[index]
 	
-	if not in_coming_mssg_que:
-		radio_mssg_received = False 		
+	# ~ if not in_coming_mssg_que:
+		# ~ radio_mssg_received = False 		
 
 
 ##This is the main function
