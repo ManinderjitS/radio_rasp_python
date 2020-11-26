@@ -121,10 +121,10 @@ def send_message_through_radio():
 #This method sends data received from xbee to android using Pi's 
 #bluetooth connection with the android		
 def send_radio_mssgs_to_android():
+	print("*****sending mssg from pi to phone")
 	global in_coming_mssg_que, client, radio_mssg_received, android_wants_data
 	
 	if radio_mssg_received and client:
-		print("*****sending mssg from pi to phone")
 		for index, mssg in enumerate(in_coming_mssg_que):
 			print("---sending back to client: ", mssg)
 			client.send(mssg)
@@ -142,7 +142,9 @@ def listen_for_radio_mssgs():
 	i = 0
 	while 1:
 		print("Listening for radio mssgs")
-		
+		if got_a_mssg_to_send:
+			print("Send the qeued mssg before listening on radio.")
+			send_message_through_radio()
 		try:
 			mssg = device.read_data(10)					
 			received_mssg = mssg.data.decode("utf-8")
@@ -151,10 +153,6 @@ def listen_for_radio_mssgs():
 		except Exception as e:
 			print("incoming message --- exception")
 			print(str(e))
-			#Send a message whenever there is a time out on listening
-			if got_a_mssg_to_send:
-				print("Send the qeued mssg before listening on radio.")
-				send_message_through_radio()
 			# ~ send_mssg_driver(i)
 			
 		if(last_time_mssg_sent_to_phone == 0):
