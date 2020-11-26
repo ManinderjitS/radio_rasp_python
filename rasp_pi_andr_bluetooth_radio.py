@@ -49,7 +49,8 @@ def xbee_instance():
 		device = XBeeDevice("/dev/ttyUSB2", 9600)
 		device.open()
 	except Exception as e:
-                print(str(e))
+		print("Xbee exception")
+		print(str(e))
 	
 
 ##This function makes a bluetooth socket 
@@ -63,6 +64,7 @@ def bluetooth_socket_binding():
 		blueth_sock.bind((hostMACAddress, port))
 		blueth_sock.listen(backlog)
 	except Exception as e:
+		print("Bluetooth binding exception")
 		print(str(e))
 
 #In our case the client almost always will be an Android device 
@@ -145,6 +147,7 @@ def listen_for_radio_mssgs():
 			print("recieved from radio: " + received_mssg)
 			in_coming_mssg_que.append(received_mssg)
 		except Exception as e:
+			print("Sending message --- exception")
 			print(str(e))
 			# ~ send_mssg_driver(i)
 			
