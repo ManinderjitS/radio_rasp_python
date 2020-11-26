@@ -110,11 +110,12 @@ def send_message_through_radio():
 				device.send_data_broadcast(mssg)
 				del out_going_mssg_que[index]
 				#Wait 2 sec before sending another package
-				time.sleep(2)
+				time.sleep(5)
 			except Exception as e:
 				print("Radio exception: ")
 				print(str(e))
 	
+	print(str(len(out_going_mssg_que)) + "\n")
 	got_a_mssg_to_send = False
 		
 #This method sends data received from xbee to android using Pi's 
