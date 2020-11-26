@@ -84,7 +84,7 @@ def blth_listening_client_connection_data():
 			try:
 				data = client.recv(size)
 				if data:
-					print("Blth data received: " + str(type(data.decode("utf-8"))))
+					print("\nBlth data received: " + str(type(data.decode("utf-8"))))
 					tmp_arr = np.concatenate((out_going_mssg_que, data))
 					out_going_mssg_que = tmp_arr
 					got_a_mssg_to_send = True
