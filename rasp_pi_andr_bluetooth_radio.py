@@ -94,10 +94,10 @@ def listening_client_connection_data():
 			try:
 				print("Wating for bluetooth data")
 				data = client.recv(size)
-				if data:
-					print("Data recieved")
-					# ~ send_message(data)
-					print("Sending back to the client")
+				# ~ if data:
+				print("Data recieved")
+				# ~ send_message(data)
+				print("Sending back to the client")
 					#client.send(data) # Echo back to client
 			except Exception as e:
 				print(str(e))
