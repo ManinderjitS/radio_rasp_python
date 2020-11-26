@@ -58,7 +58,7 @@ def wait_for_data():
 				data = client.recv(size)
 				if data:
 					data_str = data.decode("utf-8")
-					if(data_str == MssgType.DONESENDINGDATA):
+					if(data_str == "DONE"):
 						print("final mssg for this package recieved, closing socket")
 						client.close()
 						break
