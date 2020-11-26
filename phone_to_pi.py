@@ -43,7 +43,8 @@ def wait_for_clients():
 	
 	wait_for_data()
 	
-	
+	client.close()
+	blueth_sock.close()
 
 def wait_for_data():
 	global blueth_sock, client, clientInfo, got_a_mssg_to_send, out_going_mssg_que
@@ -67,12 +68,12 @@ def wait_for_data():
 			except Exception as e:
 				print("bluetooth inner exception : ")
 				print(str(e))
+				break
 	except Exception as e:	
 		print("[Closing socket] ")
 		print(e)
 		client.close()
-		blueth_sock.close()
-	
+		
 	wait_for_clients()
 	
 

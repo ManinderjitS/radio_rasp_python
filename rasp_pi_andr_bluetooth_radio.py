@@ -98,12 +98,14 @@ def blth_listening_client_connection_data():
 				except Exception as e:
 					print("bluetooth inner exception : ")
 					print(str(e))
+					break
 			t1.join()
 		except Exception as e:	
 			print("[Closing socket]: " + e)
 			client.close()
 			blueth_sock.close()
 		
+		print("\tClosing socket")
 		#wait for new client	
 		client.close()
 	
