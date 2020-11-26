@@ -108,13 +108,13 @@ def send_message_through_radio():
 		if(device):
 			try:
 				device.send_data_broadcast(mssg)
-				del out_going_mssg_que[index]
 				#Wait 2 sec before sending another package
 				time.sleep(5)
 			except Exception as e:
 				print("Radio exception: ")
 				print(str(e))
 	
+	out_going_mssg_que.clear()
 	print(str(len(out_going_mssg_que)) + "\n")
 	got_a_mssg_to_send = False
 		
