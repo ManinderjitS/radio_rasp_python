@@ -10,7 +10,6 @@ import threading
 import time
 import json
 import copy
-import numpy as np
 from digi.xbee.devices import XBeeDevice
 from enum import Enum
 
@@ -85,8 +84,7 @@ def blth_listening_client_connection_data():
 				data = client.recv(size)
 				if data:
 					print("\nBlth data received: " + data.decode("utf-8"))
-					tmp_arr = np.concatenate((out_going_mssg_que, data))
-					out_going_mssg_que = tmp_arr
+					out_going_mssg_que.append(data)
 					got_a_mssg_to_send = True
 			except Exception as e:
 				print(str(e))
