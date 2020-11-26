@@ -68,7 +68,7 @@ def bluetooth_socket_binding():
 #In our case the client almost always will be an Android device 
 def blth_listening_client_connection_data():
 	print(">>>>>listen client on bluth")
-	global blueth_sock, client, clientInfo, got_a_mssg_to_send
+	global blueth_sock, client, clientInfo, got_a_mssg_to_send, out_going_mssg_que
 	size = 1024
 	
 	#start another thread for function which listens for incoming radio mssgs
