@@ -86,3 +86,8 @@ def main():
 	bluetooth_socket_binding()
 	##Start listening for connection
 	blth_listening_client_connection_data()
+
+
+##Letting the Python interpreter about the main function
+if __name__ == "__main__":
+	main()
