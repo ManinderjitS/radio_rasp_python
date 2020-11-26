@@ -157,6 +157,7 @@ def send_radio_mssgs_to_android():
 			client.send(mssg)
 			# remove from the original
 			# ~ del in_coming_mssg_que[index]
+		client.send("DONE")
 	in_coming_mssg_que.clear()
 	if not in_coming_mssg_que:
 		radio_mssg_received = False 		
