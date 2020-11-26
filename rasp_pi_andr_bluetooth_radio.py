@@ -101,7 +101,7 @@ def send_message_through_radio():
 	for index, mssg in enumerate(out_going_mssg_que):
 		print("\tSending radio mssg: ", mssg)
 		if(device):
-			device.send_data_broadcast(mssg.encode("utf-8"))
+			device.send_data_broadcast(mssg)
 			del out_going_mssg_que[index]
 	
 	got_a_mssg_to_send = False
