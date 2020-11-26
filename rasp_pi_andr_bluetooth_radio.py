@@ -75,8 +75,7 @@ def blth_listening_client_connection_data():
 	t1.start()
 	try:
 		client, clientInfo = blueth_sock.accept() 
-		#start a second thread to send mssgs received from radio to the 
-		#android using bluetooth
+		#start a second thread to send mssgs received from radio to the android using bluetooth
 		t2 = threading.Thread(target=listen_for_radio_mssgs)
 		t2.start()
 		while 1:
@@ -84,8 +83,8 @@ def blth_listening_client_connection_data():
 			try:
 				data = client.recv(size)
 				if data:
-                                        print("Bluetooth received data to send=-=-=-=-: " + data)
-                                        got_a_mssg_to_send = True
+					print("Blth data received: " + data.decode("utf-8"))
+					got_a_mssg_to_send = True
 					out_going_mssg_que.append(data)
 			except Exception as e:
 				print(str(e))
@@ -95,32 +94,16 @@ def blth_listening_client_connection_data():
 		client.close()
 		blueth_sock.close()
 
-##File where the android device will be writing to 
-#~ exists = os.path.isfile('/dev/rfcomm0') 
-##This infinite loop is checking from new data received from the user 
-##	(android device) every 5 seconds
-#~ while(1):
-	#~ time.sleep(5)
-	#~ if exists:
-		#~ file = open("/dev/rfcomm0", "r")
-		#~ data_read = file.read()
-		#~ if not r:
-			#~ print("File is empty, no data to retrieve.")
-		#~ else:
-			#~ send_message(mssg)
-			#~ print(data_read)
-	#~ else:
-		#~ print("The file doesn't exist. \n\tCheck bluetooth connection with phone.")
-
-##The function that will send the mssg to the radio
+##This function sends the mssges thru the radio to the outside world
 def send_message_through_radio():	
-	print("-----------send msssg: ")
 	global device, out_going_mssg_que	
+	
 	for index, mssg in enumerate(out_going_mssg_que):
-		print("Sending radio mssg: ", mssg)
+		print("\tSending radio mssg: ", mssg)
 		if(device):
 			device.send_data_broadcast(mssg.encode("utf-8"))
-	out_going_mssg_que.clear()
+			del out_going_mssg_que[index]
+	
 	got_a_mssg_to_send = False
 		
 #This method sends data received from xbee to android using Pi's 
@@ -130,11 +113,11 @@ def send_radio_mssgs_to_android():
 	global in_coming_mssg_que, client, radio_mssg_received, android_wants_data
 	
 	if radio_mssg_received and client:
-		for indx, mssg in in_coming_mssg_que:
-	        	print("---sending back to client: ", mssg)
+		for index, mssg in enumerate(in_coming_mssg_que):
+			print("---sending back to client: ", mssg)
 			client.send(mssg)
 			# remove from the original
-			del in_coming_mssg_que[indx]
+			del in_coming_mssg_que[index]
 	
 	if not in_coming_mssg_que:
 		radio_mssg_received = False 		
@@ -148,7 +131,7 @@ def listen_for_radio_mssgs():
 	while 1:
 		print("Listening for radio mssgs")
 		if got_a_mssg_to_send:
-			print("There is a mssg to send from the client")
+			print("Send the qeued mssg before listening on radio.")
 			send_message_through_radio()
 		try:
 			mssg = device.read_data(10)					
@@ -222,3 +205,21 @@ def main():
 if __name__ == "__main__":
 	main()
 	 
+
+
+##File where the android device will be writing to 
+#~ exists = os.path.isfile('/dev/rfcomm0') 
+##This infinite loop is checking from new data received from the user 
+##	(android device) every 5 seconds
+#~ while(1):
+	#~ time.sleep(5)
+	#~ if exists:
+		#~ file = open("/dev/rfcomm0", "r")
+		#~ data_read = file.read()
+		#~ if not r:
+			#~ print("File is empty, no data to retrieve.")
+		#~ else:
+			#~ send_message(mssg)
+			#~ print(data_read)
+	#~ else:
+		#~ print("The file doesn't exist. \n\tCheck bluetooth connection with phone.")
