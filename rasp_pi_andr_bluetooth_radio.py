@@ -92,7 +92,7 @@ def blth_listening_client_connection_data():
 						data_str = data.decode("utf-8")
 						if(data_str == "DONE"):
 							print("\n\t\t\tdone yo")
-							break
+							pass
 						print("\nBlth data received: " + data_str)
 						out_going_mssg_que.append(data_str)
 						got_a_mssg_to_send = True
