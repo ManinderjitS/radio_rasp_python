@@ -100,6 +100,11 @@ def blth_listening_client_connection_data():
 							print("\n\t\t\tdone yo")
 							client.close()
 							break
+						elif(data_str == "ANYTHINGFORME"):
+							print("\n\t\t" + data_str + " yo")
+							send_radio_mssgs_to_android()
+							client.close()
+							break
 						print("\nBlth data received: " + data_str)
 						out_going_mssg_que.append(data_str)
 						got_a_mssg_to_send = True
@@ -151,8 +156,8 @@ def send_radio_mssgs_to_android():
 			print("---sending back to client: ", mssg)
 			client.send(mssg)
 			# remove from the original
-			del in_coming_mssg_que[index]
-	
+			# ~ del in_coming_mssg_que[index]
+	in_coming_mssg_que.clear()
 	if not in_coming_mssg_que:
 		radio_mssg_received = False 		
 	
@@ -164,30 +169,34 @@ def listen_for_radio_mssgs():
 	i = 0
 	while 1:
 		print("Listening for radio mssgs")
-		if got_a_mssg_to_send:
-			print("Send the qeued mssg before listening on radio.")
-			send_message_through_radio()
 		try:
 			mssg = device.read_data(10)					
 			received_mssg = mssg.data.decode("utf-8")
 			print("recieved from radio: " + received_mssg)
 			in_coming_mssg_que.append(received_mssg)
 			radio_mssg_received = True
+			
+			if got_a_mssg_to_send:
+				print("Send the qeued mssg before listening on radio again.")
+				send_message_through_radio()
 		except Exception as e:
 			print("incoming message --- exception")
 			print(str(e))
+			if got_a_mssg_to_send:
+				print("Send the qeued mssg before listening on radio again in exception.")
+				send_message_through_radio()
 			# ~ send_mssg_driver(i)
 			
-		if(last_time_mssg_sent_to_phone == 0):
-			time_now = int(round(time.time() * 1000))
-			send_radio_mssgs_to_android()
-			last_time_mssg_sent_to_phone = time_now
-		else:
-			time_now = int(round(time.time() * 1000))
-			time_diff = time_now - last_time_mssg_sent_to_phone
-			if(time_diff > 20):
-				last_time_mssg_sent_to_phone = time_now
-				send_radio_mssgs_to_android()
+		# ~ if(last_time_mssg_sent_to_phone == 0):
+			# ~ time_now = int(round(time.time() * 1000))
+			# ~ send_radio_mssgs_to_android()
+			# ~ last_time_mssg_sent_to_phone = time_now
+		# ~ else:
+			# ~ time_now = int(round(time.time() * 1000))
+			# ~ time_diff = time_now - last_time_mssg_sent_to_phone
+			# ~ if(time_diff > 20):
+				# ~ last_time_mssg_sent_to_phone = time_now
+				# ~ send_radio_mssgs_to_android()
 		i = i + 1
 
 #This function is creating for testing purposes, 
