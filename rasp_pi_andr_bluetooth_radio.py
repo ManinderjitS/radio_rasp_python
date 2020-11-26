@@ -72,7 +72,7 @@ def bluetooth_socket_binding():
 def blth_listening_client_connection_data():
 	print(">>>>>listen client on bluth")
 	global blueth_sock, client, clientInfo, got_a_mssg_to_send, out_going_mssg_que
-	size = 1024
+	size = 2048
 	
 	#start another thread for function which listens for incoming radio mssgs
 	t1 = threading.Thread(target=listen_for_radio_mssgs)
