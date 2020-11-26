@@ -104,7 +104,7 @@ def send_message_through_radio():
 	global device, out_going_mssg_que	
 	
 	for index, mssg in enumerate(out_going_mssg_que):
-		print("\tSending radio mssg: ", mssg)
+		print("\tSending radio mssg: ", mssg, " at index: ", index)
 		if(device):
 			try:
 				device.send_data_broadcast(mssg)
