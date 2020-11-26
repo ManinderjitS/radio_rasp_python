@@ -45,7 +45,8 @@ def blth_listening_client_connection_data():
 				print(str(e))
 		t1.join()
 	except Exception as e:	
-		print("[Closing socket]: " + e)
+		print("[Closing socket] ")
+		print(e)
 		client.close()
 		blueth_sock.close()
 
