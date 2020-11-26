@@ -136,7 +136,8 @@ def listen_for_radio_mssgs():
 		try:
 			mssg = device.read_data(10)					
 			received_mssg = mssg.data.decode("utf-8")
-	                in_coming_mssg_que.append(received_mssg)
+			print("recieved from radio: " + received_mssg)
+			in_coming_mssg_que.append(received_mssg)
 		except Exception as e:
 			print(str(e))
 			# ~ send_mssg_driver(i)
