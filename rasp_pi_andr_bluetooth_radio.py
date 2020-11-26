@@ -147,7 +147,7 @@ def listen_for_radio_mssgs():
 			print("recieved from radio: " + received_mssg)
 			in_coming_mssg_que.append(received_mssg)
 		except Exception as e:
-			print("Sending message --- exception")
+			print("incoming message --- exception")
 			print(str(e))
 			# ~ send_mssg_driver(i)
 			
