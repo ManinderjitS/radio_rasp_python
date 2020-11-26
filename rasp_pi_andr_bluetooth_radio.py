@@ -11,6 +11,10 @@ import time
 import json
 import copy
 import traceback
+import logging
+
+logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] (%(threadName)-9s) %(message)s',)
+
 from digi.xbee.devices import XBeeDevice
 from enum import Enum
 
@@ -23,6 +27,7 @@ lock = threading.Lock()
 
 device = object()
 hostMACAddress = "B8:27:EB:0A:26:6F" #for bluetooth interface
+hostMACAddress2 = "34:02:86:64:3F:F1" #for bluetooth interface of laptop
 blueth_sock = object()
 client = None
 clientInfo = object()
@@ -62,7 +67,8 @@ def bluetooth_socket_binding():
 	backlog = 1
 	blueth_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 	try:
-		blueth_sock.bind((hostMACAddress, port))
+		# ~ blueth_sock.bind((hostMACAddress, port))
+		blueth_sock.bind((hostMACAddress2, port))
 		blueth_sock.listen(backlog)
 	except Exception as e:
 		print("Bluetooth binding exception")
@@ -75,15 +81,15 @@ def blth_listening_client_connection_data():
 	size = 2048
 	
 	#start another thread for function which listens for incoming radio mssgs
-	t1 = threading.Thread(target=listen_for_radio_mssgs)
+	t1 = threading.Thread(name="radio_thread",target=listen_for_radio_mssgs)
 	t1.start()
 	while 1:
 		try:
 			print("wating for clients:")
 			client, clientInfo = blueth_sock.accept() 
 			#start a second thread to send mssgs received from radio to the android using bluetooth
-			t2 = threading.Thread(target=listen_for_radio_mssgs)
-			t2.start()
+			#t2 = threading.Thread(name="",target=listen_for_radio_mssgs)
+			#t2.start()
 			while 1:
 				print("main thread - - - - - - Bluetooth connected: listening for data.") 
 				try:
@@ -92,7 +98,8 @@ def blth_listening_client_connection_data():
 						data_str = data.decode("utf-8")
 						if(data_str == "DONE"):
 							print("\n\t\t\tdone yo")
-							pass
+							client.close()
+                                                        break
 						print("\nBlth data received: " + data_str)
 						out_going_mssg_que.append(data_str)
 						got_a_mssg_to_send = True
@@ -124,7 +131,7 @@ def send_message_through_radio():
 			try:
 				device.send_data_broadcast(mssg)
 				#Wait 2 sec before sending another package
-				time.sleep(5)
+				#time.sleep(5)
 			except Exception as e:
 				print("Radio exception: ")
 				print(str(e))
