@@ -10,6 +10,7 @@ import threading
 import time
 import json
 import copy
+import traceback
 from digi.xbee.devices import XBeeDevice
 from enum import Enum
 
@@ -87,6 +88,7 @@ def blth_listening_client_connection_data():
 					out_going_mssg_que.append(data)
 					got_a_mssg_to_send = True
 			except Exception as e:
+				print("bluetooth inner exception : " + traceback.print_exc())
 				print(str(e))
 		t1.join()
 	except Exception as e:	
@@ -105,6 +107,7 @@ def send_message_through_radio():
 				device.send_data_broadcast(mssg)
 				del out_going_mssg_que[index]
 			except Exception as e:
+				print("Radio exception: " + traceback.print_exc())
 				print(str(e))
 	
 	got_a_mssg_to_send = False
