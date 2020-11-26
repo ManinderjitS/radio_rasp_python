@@ -142,9 +142,7 @@ def listen_for_radio_mssgs():
 	i = 0
 	while 1:
 		print("Listening for radio mssgs")
-		if got_a_mssg_to_send:
-			print("Send the qeued mssg before listening on radio.")
-			send_message_through_radio()
+		
 		try:
 			mssg = device.read_data(10)					
 			received_mssg = mssg.data.decode("utf-8")
@@ -153,6 +151,10 @@ def listen_for_radio_mssgs():
 		except Exception as e:
 			print("incoming message --- exception")
 			print(str(e))
+			#Send a message whenever there is a time out on listening
+			if got_a_mssg_to_send:
+				print("Send the qeued mssg before listening on radio.")
+				send_message_through_radio()
 			# ~ send_mssg_driver(i)
 			
 		if(last_time_mssg_sent_to_phone == 0):
