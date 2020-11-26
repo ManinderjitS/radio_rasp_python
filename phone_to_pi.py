@@ -37,15 +37,29 @@ def bluetooth_socket_binding():
 def wait_for_clients():
 	print(">>>>>listen client on bluth")
 	global blueth_sock, client, clientInfo, got_a_mssg_to_send, out_going_mssg_que
-	size = 1024
 	
 	client, clientInfo = blueth_sock.accept()
 	
+	
+
+def wait_for_data():
+	global blueth_sock, client, clientInfo, got_a_mssg_to_send, out_going_mssg_que
+	size = 1024
+	
 	try: 
-		while 1:
-			print("main thread - - - - - - Bluetooth connected: listening for data.") 
+		while client:
+			print("Bluetooth connected: listening for data.") 
 			try:
-				wait_for_data()
+				print("\twaiting for data")
+				data = client.recv(size)
+				if data:
+					data_str = data.decode("utf-8")
+					if(data_str == MssgType.DONESENDINGDATA):
+						print("final mssg for this package recieved, closing socket")
+						client.close()
+					print("\nBlth data received: " + data_str)
+					out_going_mssg_que.append(data_str)
+					got_a_mssg_to_send = True
 			except Exception as e:
 				print("bluetooth inner exception : ")
 				print(str(e))
@@ -54,21 +68,9 @@ def wait_for_clients():
 		print(e)
 		client.close()
 		blueth_sock.close()
-
-def wait_for_data():
-	global blueth_sock, client, clientInfo, got_a_mssg_to_send, out_going_mssg_que
 	
-	print("\twaiting for data")
-	data = client.recv(size)
-	if data:
-		data_str = data.decode("utf-8")
-		if(data_str == MssgType.DONESENDINGDATA):
-			print("final mssg for this package recieved, closing socket")
-			client.close()
-			wait_for_clients()
-		print("\nBlth data received: " + data_str)
-		out_going_mssg_que.append(data_str)
-		got_a_mssg_to_send = True
+	wait_for_clients()
+	
 
 # ~ #This method sends data received from xbee to android using Pi's 
 # ~ #bluetooth connection with the android		
