@@ -9,7 +9,7 @@ class MssgType(Enum):
 	SENDTOOUTSIDEWORLD = 1
 	SENDTOANDROID = 4
     
-hostMACAddress = "B8:27:EB:0A:26:6F" #for bluetooth interface
+hostMACAddress = "34:02:86:64:3F:F1" #for bluetooth interface
 blueth_sock = object()
 client = None
 clientInfo = object()
