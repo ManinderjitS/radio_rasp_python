@@ -33,6 +33,8 @@ client = None
 clientInfo = object()
 in_coming_mssg_que = []
 out_going_mssg_que = []
+out_going_str = ""
+in_coming_str = ""
 last_time_mssg_sent_to_phone = 0
 radio_mssg_received = False
 got_a_mssg_to_send = False 
@@ -101,7 +103,7 @@ def blth_listening_client_connection_data():
 							client.close()
 							break
 						elif(data_str == "ANYTHINGFORME"):
-							print("\n\t\t" + data_str + " yo")
+							print("\n\t\t" + out_going_str + " yo")
 							send_radio_mssgs_to_android()
 							client.close()
 							break
@@ -148,16 +150,18 @@ def send_message_through_radio():
 #This method sends data received from xbee to android using Pi's 
 #bluetooth connection with the android		
 def send_radio_mssgs_to_android():
-	global in_coming_mssg_que, client, radio_mssg_received, android_wants_data
+	global in_coming_mssg_que, client, radio_mssg_received, android_wants_data, in_coming_str
 	
 	if radio_mssg_received and client:
-		print("*****sending mssg from pi to phone")
+		print("*****sending mssg from pi to phone\n" + in_coming_str)
+		# ~ client.send(in_coming_str)
 		for index, mssg in enumerate(in_coming_mssg_que):
 			print("---sending back to client: ", mssg)
 			client.send(mssg)
-			# remove from the original
+			# ~ # remove from the original
 			# ~ del in_coming_mssg_que[index]
 		client.send("DONE")
+		time.sleep(10)
 	in_coming_mssg_que.clear()
 	if not in_coming_mssg_que:
 		radio_mssg_received = False 		
@@ -165,7 +169,7 @@ def send_radio_mssgs_to_android():
 #Listen for mssgs on the radio device		
 def listen_for_radio_mssgs():
 	print("Listen for radio mssg")
-	global in_coming_mssg_que, client, clientInfo, radio_mssg_received, got_a_mssg_to_send, last_time_mssg_sent_to_phone
+	global in_coming_mssg_que, client, clientInfo, radio_mssg_received, got_a_mssg_to_send, last_time_mssg_sent_to_phone, in_coming_str
 	#listen for mssg on radio for 60 sec  
 	i = 0
 	while 1:
@@ -175,6 +179,7 @@ def listen_for_radio_mssgs():
 			received_mssg = mssg.data.decode("utf-8")
 			print("recieved from radio: " + received_mssg)
 			in_coming_mssg_que.append(received_mssg)
+			in_coming_str = in_coming_str + received_mssg
 			radio_mssg_received = True
 			
 			if got_a_mssg_to_send:
