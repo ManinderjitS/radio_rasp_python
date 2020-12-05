@@ -154,6 +154,7 @@ def send_message_through_radio():
 			except Exception as e:
 				print("Radio exception: ")
 				print(str(e))
+				continue
 	print("\t\t-------------------Packets sent: ", rad_pckts_sent)
 	rad_pckts_sent = 0
 	out_going_mssg_que.clear()
@@ -210,6 +211,7 @@ def listen_for_radio_mssgs():
 			if got_a_mssg_to_send:
 				print("Send the qeued mssg before listening on radio again in exception.")
 				send_message_through_radio()
+				continue
 			# ~ send_mssg_driver(i)
 			
 		# ~ if(last_time_mssg_sent_to_phone == 0):
