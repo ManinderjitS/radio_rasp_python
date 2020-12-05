@@ -113,7 +113,7 @@ def blth_listening_client_connection_data():
 							client.close()
 							break
 						elif(data_str == "DONETESTING"):
-							print("\n\t\t" + "Testing finished: " + blth_pckts_recvd)
+							print("\n\t\t" + "---------------Testing finished: \n\t", blth_pckts_recvd)
 							blth_pckts_recvd = 0
 							client.close()
 							break
@@ -154,7 +154,7 @@ def send_message_through_radio():
 			except Exception as e:
 				print("Radio exception: ")
 				print(str(e))
-	print("\t\tPackets sent: " + rad_pckts_sent)
+	print("\t\t-------------------Packets sent: ", rad_pckts_sent)
 	rad_pckts_sent = 0
 	out_going_mssg_que.clear()
 	print(str(len(out_going_mssg_que)) + "\n")
@@ -163,8 +163,10 @@ def send_message_through_radio():
 #This method sends data received from xbee to android using Pi's 
 #bluetooth connection with the android		
 def send_radio_mssgs_to_android():
-	global in_coming_mssg_que, client, radio_mssg_received, android_wants_data, in_coming_str, blth_pckts_sent
+	global in_coming_mssg_que, client, radio_mssg_received, android_wants_data, in_coming_str, blth_pckts_sent, rad_pckts_recvd
 	
+	print("------------------------mssg received form radio: \n\t", rad_pckts_recvd)
+	rad_pckts_recvd = 0
 	if radio_mssg_received and client:
 		print("*****sending mssg from pi to phone\n" + in_coming_str)
 		# ~ client.send(in_coming_str)
@@ -177,6 +179,7 @@ def send_radio_mssgs_to_android():
 		client.send("DONE")
 		time.sleep(10)
 	in_coming_mssg_que.clear()
+	print("---------------------------------\n\t", blth_pckts_sent)
 	blth_pckts_sent = 0
 	if not in_coming_mssg_que:
 		radio_mssg_received = False 		
