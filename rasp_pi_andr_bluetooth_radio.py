@@ -112,11 +112,6 @@ def blth_listening_client_connection_data():
 							send_radio_mssgs_to_android()
 							client.close()
 							break
-						elif(data_str == "DONETESTING"):
-							print("\n\t\t" + "---------------Testing finished: \n\t", blth_pckts_recvd)
-							blth_pckts_recvd = 0
-							client.close()
-							break
 						print("\nBlth data received: " + data_str)
 						out_going_mssg_que.append(data_str)
 						blth_pckts_recvd += 1
@@ -141,7 +136,10 @@ def blth_listening_client_connection_data():
 
 ##This function sends the mssges thru the radio to the outside world
 def send_message_through_radio():	
-	global device, out_going_mssg_que, rad_pckts_sent	
+	global device, out_going_mssg_que, rad_pckts_sent, blth_pckts_recvd
+		
+	print("---------------------Blth pckts recvd: \n\t", blth_pckts_recvd)
+	blth_pckts_recvd = 0
 	
 	for index, mssg in enumerate(out_going_mssg_que):
 		print("\tSending radio mssg: ", mssg, " at index: ", index)
