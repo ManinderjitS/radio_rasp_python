@@ -144,7 +144,7 @@ def send_message_through_radio():
 	for index, mssg in enumerate(out_going_mssg_que):
 		mssg_divider = "</e_tag>"
 		split_mssg = mssg.split(mssg_divider)
-		for sub_mssg in enumerate(split_mssg):
+		for index, sub_mssg in enumerate(split_mssg):
 			sub_mssg = sub_mssg + mssg_divider
 			if(device):
 				try:
