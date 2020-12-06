@@ -142,17 +142,21 @@ def send_message_through_radio():
 	blth_pckts_recvd = 0
 	
 	for index, mssg in enumerate(out_going_mssg_que):
-		print("\tSending radio mssg: ", mssg, " at index: ", index)
-		if(device):
-			try:
-				device.send_data_broadcast(mssg)
-				rad_pckts_sent += 1
-				#Wait 2 sec before sending another package
-				time.sleep(1)
-			except Exception as e:
-				print("Radio exception: ")
-				print(str(e))
-				continue
+		mssg_divider = "</e_tag>"
+		split_mssg = mssg.split(mssg_divider)
+		for sub_mssg in enumerate(split_mssg):
+			sub_mssg = sub_mssg + mssg_divider
+			if(device):
+				try:
+					print("\tSending radio mssg: ", sub_mssg)
+					device.send_data_broadcast(sub_mssg)
+					rad_pckts_sent += 1
+					#Wait 2 sec before sending another package
+					time.sleep(1)
+				except Exception as e:
+					print("Radio exception: ")
+					print(str(e))
+					continue
 	print("\t\t-------------------Packets sent: ", rad_pckts_sent)
 	rad_pckts_sent = 0
 	out_going_mssg_que.clear()
