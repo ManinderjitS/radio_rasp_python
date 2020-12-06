@@ -148,7 +148,7 @@ def send_message_through_radio():
 				device.send_data_broadcast(mssg)
 				rad_pckts_sent += 1
 				#Wait 2 sec before sending another package
-				time.sleep(2)
+				time.sleep(1)
 			except Exception as e:
 				print("Radio exception: ")
 				print(str(e))
