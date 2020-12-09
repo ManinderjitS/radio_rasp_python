@@ -12,3 +12,5 @@
 * First download the appropriate libraries in the script.
 * Then run it with the following command:
  `python3 rasp_pi_andr_bluetooth_radio.py`
+
+## The second file in the folder, `phone_to_pi.py`, is not meant to be used.
