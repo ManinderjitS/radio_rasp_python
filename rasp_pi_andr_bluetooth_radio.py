@@ -26,8 +26,7 @@ class MssgType(Enum):
 lock = threading.Lock()
 
 device = object()
-hostMACAddress = "B8:27:EB:0A:26:6F" #for bluetooth interface
-hostMACAddress2 = "34:02:86:64:3F:F1" #for bluetooth interface of laptop
+hostMACAddress = "some mac address of the bluetooth interface" 
 blueth_sock = object()
 client = None
 clientInfo = object()
