@@ -26,8 +26,7 @@ class MssgType(Enum):
 lock = threading.Lock()
 
 device = object()
-hostMACAddress = "B8:27:EB:0A:26:6F" #for bluetooth interface
-hostMACAddress2 = "34:02:86:64:3F:F1" #for bluetooth interface of laptop
+hostMACAddress = "some mac address of the bluetooth interface" 
 blueth_sock = object()
 client = None
 clientInfo = object()
@@ -39,6 +38,11 @@ last_time_mssg_sent_to_phone = 0
 radio_mssg_received = False
 got_a_mssg_to_send = False 
 
+#Test related vars
+blth_pckts_recvd = 0
+rad_pckts_sent = 0
+rad_pckts_recvd = 0
+blth_pckts_sent = 0
 
 #This class isn't being used yet
 class FuncThread(threading.Thread):
@@ -79,7 +83,7 @@ def bluetooth_socket_binding():
 #In our case the client almost always will be an Android device 
 def blth_listening_client_connection_data():
 	print(">>>>>listen client on bluth")
-	global blueth_sock, client, clientInfo, got_a_mssg_to_send, out_going_mssg_que
+	global blueth_sock, client, clientInfo, got_a_mssg_to_send, out_going_mssg_que, blth_pckts_recvd
 	size = 2048
 	
 	#start another thread for function which listens for incoming radio mssgs
@@ -109,6 +113,7 @@ def blth_listening_client_connection_data():
 							break
 						print("\nBlth data received: " + data_str)
 						out_going_mssg_que.append(data_str)
+						blth_pckts_recvd += 1
 						got_a_mssg_to_send = True
 				except Exception as e:
 					print(str(e))
@@ -130,19 +135,29 @@ def blth_listening_client_connection_data():
 
 ##This function sends the mssges thru the radio to the outside world
 def send_message_through_radio():	
-	global device, out_going_mssg_que	
+	global device, out_going_mssg_que, rad_pckts_sent, blth_pckts_recvd
+		
+	print("---------------------Blth pckts recvd: \n\t", blth_pckts_recvd)
+	blth_pckts_recvd = 0
 	
 	for index, mssg in enumerate(out_going_mssg_que):
-		print("\tSending radio mssg: ", mssg, " at index: ", index)
-		if(device):
-			try:
-				device.send_data_broadcast(mssg)
-				#Wait 2 sec before sending another package
-				time.sleep(1)
-			except Exception as e:
-				print("Radio exception: ")
-				print(str(e))
-	
+		mssg_divider = "</e_tag>"
+		split_mssg = mssg.split(mssg_divider)
+		for index, sub_mssg in enumerate(split_mssg):
+			sub_mssg = sub_mssg + mssg_divider
+			if(device):
+				try:
+					print("\tSending radio mssg: ", sub_mssg)
+					device.send_data_broadcast(sub_mssg)
+					rad_pckts_sent += 1
+					#Wait 2 sec before sending another package
+					time.sleep(1)
+				except Exception as e:
+					print("Radio exception: ")
+					print(str(e))
+					continue
+	print("\t\t-------------------Packets sent: ", rad_pckts_sent)
+	rad_pckts_sent = 0
 	out_going_mssg_que.clear()
 	print(str(len(out_going_mssg_que)) + "\n")
 	got_a_mssg_to_send = False
@@ -150,26 +165,31 @@ def send_message_through_radio():
 #This method sends data received from xbee to android using Pi's 
 #bluetooth connection with the android		
 def send_radio_mssgs_to_android():
-	global in_coming_mssg_que, client, radio_mssg_received, android_wants_data, in_coming_str
+	global in_coming_mssg_que, client, radio_mssg_received, android_wants_data, in_coming_str, blth_pckts_sent, rad_pckts_recvd
 	
+	print("------------------------mssg received form radio: \n\t", rad_pckts_recvd)
+	rad_pckts_recvd = 0
 	if radio_mssg_received and client:
 		print("*****sending mssg from pi to phone\n" + in_coming_str)
 		# ~ client.send(in_coming_str)
 		for index, mssg in enumerate(in_coming_mssg_que):
 			print("---sending back to client: ", mssg)
+			blth_pckts_sent += 1
 			client.send(mssg)
 			# ~ # remove from the original
 			# ~ del in_coming_mssg_que[index]
 		client.send("DONE")
 		time.sleep(10)
 	in_coming_mssg_que.clear()
+	print("---------------------------------\n\t", blth_pckts_sent)
+	blth_pckts_sent = 0
 	if not in_coming_mssg_que:
 		radio_mssg_received = False 		
 	
 #Listen for mssgs on the radio device		
 def listen_for_radio_mssgs():
 	print("Listen for radio mssg")
-	global in_coming_mssg_que, client, clientInfo, radio_mssg_received, got_a_mssg_to_send, last_time_mssg_sent_to_phone, in_coming_str
+	global in_coming_mssg_que, client, clientInfo, radio_mssg_received, got_a_mssg_to_send, last_time_mssg_sent_to_phone, in_coming_str, rad_pckts_recvd
 	#listen for mssg on radio for 60 sec  
 	i = 0
 	while 1:
@@ -179,6 +199,7 @@ def listen_for_radio_mssgs():
 			received_mssg = mssg.data.decode("utf-8")
 			print("recieved from radio: " + received_mssg)
 			in_coming_mssg_que.append(received_mssg)
+			rad_pckts_recvd += 1 
 			in_coming_str = in_coming_str + received_mssg
 			radio_mssg_received = True
 			
@@ -191,6 +212,7 @@ def listen_for_radio_mssgs():
 			if got_a_mssg_to_send:
 				print("Send the qeued mssg before listening on radio again in exception.")
 				send_message_through_radio()
+				continue
 			# ~ send_mssg_driver(i)
 			
 		# ~ if(last_time_mssg_sent_to_phone == 0):
