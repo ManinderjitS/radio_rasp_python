@@ -74,7 +74,7 @@ def bluetooth_socket_binding():
 	blueth_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 	try:
 		# ~ blueth_sock.bind((hostMACAddress, port))
-		blueth_sock.bind((hostMACAddress2, port))
+		blueth_sock.bind((hostMACAddress, port))
 		blueth_sock.listen(backlog)
 	except Exception as e:
 		print("Bluetooth binding exception")
